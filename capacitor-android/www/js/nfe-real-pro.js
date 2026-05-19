@@ -299,8 +299,34 @@
         <div><label class="j-label">Valor</label><input class="j-input nf-parc-valor" inputmode="decimal" value="${esc(fmtBR(d.valor||0))}"></div>
       </div>`).join('');
   }
+  function ensureAgrupamentoPeriodoBox(){
+    let box = $('nfAgrupamentoPeriodoBox');
+    if(!box){
+      const div = D.createElement('div');
+      div.id = 'nfAgrupamentoPeriodoBox';
+      div.style.cssText = 'margin-top:10px;border:1px solid var(--border);background:rgba(0,212,255,.055);border-radius:4px;padding:10px;display:none;';
+      const anchor = $('nfParcelasBox') || $('divParcelasNF')?.parentElement || $('containerItensNF')?.parentElement;
+      anchor?.insertAdjacentElement('afterend', div);
+      box = div;
+    }
+    box.innerHTML = `
+      <div style="font-family:var(--fd);font-weight:800;margin-bottom:8px;color:var(--cyan)">AGRUPAMENTO POR FORNECEDOR / PERIODO</div>
+      <div class="form-row cols-3">
+        <div class="form-group"><label class="j-label">Periodo de agrupamento</label><input type="number" inputmode="numeric" class="j-input" id="nfAgrPeriodoDias" min="1" step="1" value="${esc($('nfAgrPeriodoDias')?.value || '7')}"></div>
+        <div class="form-group"><label class="j-label">Vencimento do boleto agrupado</label><input type="date" class="j-input" id="nfAgrVenc" value="${esc($('nfAgrVenc')?.value || getVal('nfVenc') || isoToday())}"></div>
+        <div class="form-group"><label class="j-label">Status inicial</label><select class="j-select" id="nfAgrStatus"><option value="Pendente">Pendente</option><option value="Aguardando Boleto">Aguardando Boleto</option></select></div>
+      </div>
+      <small style="display:block;color:var(--muted);font-family:var(--fm);font-size:.64rem;">A compra fica marcada para somar com outras compras do mesmo fornecedor no mesmo periodo. O vencimento informado e o vencimento do boleto consolidado.</small>
+    `;
+    return box;
+  }
+  function mostrarAgrupamentoPeriodoNF(show){
+    const box = ensureAgrupamentoPeriodoBox();
+    box.style.display = show ? 'block' : 'none';
+  }
   function gerarParcelasManuais(){
     const forma = getVal('nfPgtoForma');
+    if(forma === 'AgrupamentoPeriodo'){ renderParcels([]); mostrarAgrupamentoPeriodoNF(true); return; }
     if(!['Boleto','Parcelado'].includes(forma)){ renderParcels([]); return; }
     const n = parseInt(getVal('nfParcelas') || '1',10) || 1;
     const base = getVal('nfVenc') || isoToday();
@@ -338,7 +364,8 @@
   W.checkPgtoNF = function(){
     const forma = getVal('nfPgtoForma');
     if($('divParcelasNF')) $('divParcelasNF').style.display = ['Parcelado','Boleto'].includes(forma) ? 'block' : 'none';
-    if(['Parcelado','Boleto'].includes(forma)) gerarParcelasManuais(); else renderParcels([]);
+    mostrarAgrupamentoPeriodoNF(forma === 'AgrupamentoPeriodo');
+    if(['Parcelado','Boleto','AgrupamentoPeriodo'].includes(forma)) gerarParcelasManuais(); else renderParcels([]);
   };
   function preencherFornecedorTemporario(fornec){
     if(!$('nfFornec') || !fornec) return;
@@ -442,9 +469,13 @@
     setVal('nfNumero',''); setVal('nfData', isoToday()); setVal('nfVenc','');
     if($('containerItensNF')) $('containerItensNF').innerHTML = '';
     if($('nfTotal')) $('nfTotal').textContent = '0,00';
-    if($('nfPgtoForma')) $('nfPgtoForma').value = 'Dinheiro';
+    if($('nfPgtoForma')) {
+      if(!$('nfPgtoForma').querySelector('option[value="AgrupamentoPeriodo"]')) $('nfPgtoForma').insertAdjacentHTML('beforeend','<option value="AgrupamentoPeriodo">Agrupamento por periodo</option>');
+      $('nfPgtoForma').value = 'Dinheiro';
+    }
     if($('nfParcelas')) { if(!$('nfParcelas').querySelector('option[value="1"]')) $('nfParcelas').insertAdjacentHTML('afterbegin','<option value="1">1x</option>'); $('nfParcelas').value='1'; $('nfParcelas').onchange = gerarParcelasManuais; }
     if($('nfVenc')) $('nfVenc').onchange = gerarParcelasManuais;
+    mostrarAgrupamentoPeriodoNF(false);
     if(typeof W.popularSelects === 'function') W.popularSelects();
     renderFiscalResumo(null); renderParcels([]); W.adicionarItemNF(); W.checkPgtoNF();
   };
@@ -837,10 +868,17 @@
     const forma = getVal('nfPgtoForma') || 'Dinheiro';
     const formaNorm = String(forma).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
     const formaAVista = formaNorm.includes('pix') || formaNorm.includes('dinheiro') || formaNorm.includes('debito');
-    const formaPermiteParcelas = formaNorm.includes('boleto') || formaNorm.includes('parcelado');
+    const formaAgrupamentoPeriodo = forma === 'AgrupamentoPeriodo' || formaNorm.includes('agrupamento');
+    const formaPermiteParcelas = !formaAgrupamentoPeriodo && (formaNorm.includes('boleto') || formaNorm.includes('parcelado'));
     const parcelasFinanceiras = formaPermiteParcelas && !formaAVista ? parcelas : [];
     const statusFinanceiro = formaAVista ? 'Pago' : 'Pendente';
-    if(parcelasFinanceiras.length){
+    if(formaAgrupamentoPeriodo){
+      const diasAgr = Math.max(1, parseInt(getVal('nfAgrPeriodoDias') || '7', 10) || 7);
+      const vencAgr = getVal('nfAgrVenc') || getVal('nfVenc') || isoToday();
+      const statusAgr = getVal('nfAgrStatus') || 'Pendente';
+      const grupoKey = ['fornecedor', fornecedorId || onlyDigits(nfe?.fornecedor?.cnpj || ''), 'periodo', diasAgr, vencAgr].join('_').replace(/[.#$\[\]\/]/g, '_');
+      batch.set(W.db.collection('financeiro').doc(), { tenantId:W.J.tid, tipo:'SaÃ­da', status:statusAgr, desc:`Agrupamento fornecedor ${diasAgr} dias â€” NF ${nfPayload.numero || 's/n'} â€” ${fornecedorNome || nfe?.fornecedor?.nome || 'Fornecedor'}`, valor:totalNF, pgto:'Agrupamento por periodo', venc:vencAgr, notaFiscalId:nfRef.id, chaveNFe:nfPayload.chave, fornecedorId, fornecedorNome:fornecedorNome || nfe?.fornecedor?.nome || '', agrupamentoPeriodo:true, agrupamentoDias:diasAgr, agrupamentoVencimento:vencAgr, agrupamentoFornecedorKey:grupoKey, createdAt:new Date().toISOString() });
+    } else if(parcelasFinanceiras.length){
       for(const [idx,p] of parcelasFinanceiras.entries()){
         batch.set(W.db.collection('financeiro').doc(), { tenantId:W.J.tid, tipo:'Saída', status:statusFinanceiro, desc:`NF ${nfPayload.numero || 's/n'} — ${nfe?.fornecedor?.nome || 'Fornecedor'} (${idx+1}/${parcelasFinanceiras.length})`, valor:p.valor, pgto:forma, venc:p.vencimento || isoToday(), notaFiscalId:nfRef.id, chaveNFe:nfPayload.chave, fornecedorId, createdAt:new Date().toISOString() });
       }

@@ -1659,6 +1659,24 @@ window.renderServicoOSRow = function(s) {
 
 window.adicionarPecaOS = function() {
   const ehGov = typeof window._osClienteGovernamental === 'function' && window._osClienteGovernamental();
+  const existeFluxoAgrupado = !!document.querySelector('#containerPecasOS .cilia-peca-wrap');
+  if (existeFluxoAgrupado && typeof window.renderCiliaPecaOSRow === 'function') {
+    const idx = document.querySelectorAll('#containerPecasOS [data-cilia-piece-index]').length;
+    window.renderCiliaPecaOSRow({
+      codigo: '',
+      desc: '',
+      qtd: 1,
+      venda: 0,
+      ciliaPieceIndex: idx,
+      ciliaGrupo: 'OUTROS',
+      ciliaGrupoOrdem: 900,
+      ciliaAgrupador: 'manual',
+      ciliaPosicaoOrdem: 9000,
+      ciliaManual: true
+    }, []);
+    window.toast?.('Peca manual criada com grupo editavel e servicos vinculados.', 'ok');
+    return;
+  }
   const sel = document.createElement('div');
 
   if (ehGov) {
@@ -4319,15 +4337,63 @@ function _ciliaOrdenarPecasImportadas(pecas) {
   });
 }
 
+function _ciliaGrupoNomesPadrao() {
+  return ['SUSPENSAO','FREIO','DIRECAO','RODAS / PNEUS','MOTOR / ALIMENTACAO','ARREFECIMENTO','ELETRICA / ILUMINACAO','TRANSMISSAO','FUNILARIA / LATARIA','ACABAMENTO / VIDROS','OUTROS'];
+}
+
+function _ciliaGrupoOrdemManual(nome) {
+  const mapa = {
+    'SUSPENSAO': 10,
+    'FREIO': 20,
+    'DIRECAO': 30,
+    'RODAS / PNEUS': 40,
+    'MOTOR / ALIMENTACAO': 50,
+    'ARREFECIMENTO': 60,
+    'ELETRICA / ILUMINACAO': 70,
+    'TRANSMISSAO': 80,
+    'FUNILARIA / LATARIA': 90,
+    'ACABAMENTO / VIDROS': 100,
+    'OUTROS': 900
+  };
+  const n = String(nome || '').trim().toUpperCase() || 'OUTROS';
+  return mapa[n] || 800;
+}
+
+function _ciliaGrupoOptionsHTML(selected) {
+  const sel = String(selected || '').trim().toUpperCase();
+  const nomes = _ciliaGrupoNomesPadrao().slice();
+  if (sel && !nomes.includes(sel)) nomes.push(sel);
+  return nomes.map(nome => `<option value="${escOS(nome)}" ${nome === sel ? 'selected' : ''}>${escOS(nome)}</option>`).join('');
+}
+
 function _ciliaGrupoBadgeHTML(peca, destaque) {
   if (!peca?.ciliaGrupo) return '';
   const bg = destaque ? 'rgba(0,212,255,.12)' : 'rgba(0,212,255,.055)';
   const border = destaque ? 'rgba(0,212,255,.36)' : 'rgba(0,212,255,.16)';
-  return `<div class="cilia-grupo-badge" style="display:flex;justify-content:space-between;gap:8px;align-items:center;margin:0 0 7px 0;padding:5px 7px;background:${bg};border:1px solid ${border};border-radius:3px;font-family:var(--fm);font-size:.58rem;letter-spacing:.8px;color:var(--cyan);text-transform:uppercase;">
-    <span>${destaque ? 'GRUPO ' : ''}${escOS(peca.ciliaGrupo)}</span>
-    ${peca.ciliaAgrupador ? `<small style="color:var(--muted);font-size:.54rem;text-transform:none;">${escOS(peca.ciliaAgrupador)}</small>` : ''}
+  return `<div class="cilia-grupo-badge" style="display:grid;grid-template-columns:82px minmax(170px,220px) minmax(140px,1fr);gap:8px;align-items:center;margin:0 0 7px 0;padding:6px 7px;background:${bg};border:1px solid ${border};border-radius:3px;font-family:var(--fm);font-size:.58rem;letter-spacing:.8px;color:var(--cyan);text-transform:uppercase;">
+    <span>${destaque ? 'GRUPO' : 'Grupo'}</span>
+    <select class="j-select cilia-grupo-select" onchange="window._ciliaAtualizarGrupoPeca(this)" style="height:28px;min-height:28px;font-size:.62rem;font-family:var(--fm);text-transform:uppercase;">${_ciliaGrupoOptionsHTML(peca.ciliaGrupo)}</select>
+    <input type="text" class="j-input cilia-agrupador-input" value="${_escVal(peca.ciliaAgrupador || '')}" placeholder="subgrupo: dianteiro, traseiro, filtro..." oninput="window._ciliaAtualizarGrupoPeca(this)" style="height:28px;min-height:28px;font-size:.60rem;font-family:var(--fm);">
   </div>`;
 }
+
+window._ciliaAtualizarGrupoPeca = function(el) {
+  const wrap = el?.closest?.('.cilia-peca-wrap');
+  if (!wrap) return;
+  const grupo = (wrap.querySelector('.cilia-grupo-select')?.value || 'OUTROS').trim().toUpperCase();
+  const agrupador = (wrap.querySelector('.cilia-agrupador-input')?.value || '').trim();
+  const ordem = _ciliaGrupoOrdemManual(grupo);
+  wrap.dataset.ciliaGrupo = grupo;
+  wrap.dataset.ciliaGrupoOrdem = String(ordem);
+  wrap.dataset.ciliaAgrupador = agrupador;
+  const pecaRow = wrap.querySelector('[data-cilia="1"], [data-peca-avulsa="1"]');
+  if (pecaRow) {
+    pecaRow.dataset.ciliaGrupo = grupo;
+    pecaRow.dataset.ciliaGrupoOrdem = String(ordem);
+    pecaRow.dataset.ciliaAgrupador = agrupador;
+  }
+  if (typeof window.calcOSTotal === 'function') window.calcOSTotal();
+};
 
 function _ciliaDeveAbrirGrupoRender(peca) {
   const container = typeof $ === 'function' ? $('containerPecasOS') : document.getElementById('containerPecasOS');

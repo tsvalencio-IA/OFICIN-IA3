@@ -1778,7 +1778,7 @@
     const out = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     const blob = new Blob([out], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     await salvarArquivoBlobExportar(blob, fname);
-    window.toast?.('ExcelJS nao carregou; itens agrupados exportados em modo compatibilidade.', 'warn');
+    window.toast?.('Itens agrupados exportados em planilha propria, sem usar formulas do template PMSP.', 'ok');
   }
 
   async function exportarOrcamentoPMSPModo(modo) {
@@ -1797,7 +1797,12 @@
 
       const veiculo = (window.J?.veiculos || []).find(v => v.id === os.veiculoId) || {};
       if (modo === 'itens_agrupados') {
-        const ok = await exportarComposicaoExcelJS(os, cli, veiculo);
+        let ok = false;
+        try {
+          ok = await exportarComposicaoExcelJS(os, cli, veiculo);
+        } catch (errExcelJS) {
+          console.warn('[PMSP XLSX] Template agrupado indisponivel; usando planilha propria sem formulas compartilhadas.', errExcelJS?.message || errExcelJS);
+        }
         if (!ok) await exportarComposicaoFallbackSheetJS(os, cli, veiculo);
       } else {
         const ok = await exportarComExcelJS(os, cli, veiculo);
