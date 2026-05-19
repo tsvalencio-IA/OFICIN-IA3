@@ -713,6 +713,20 @@
     c.alignment = { ...(c.alignment || {}), horizontal: 'center', vertical: 'middle', shrinkToFit: true };
   }
 
+  function congelarFormulasCompartilhadasPMSP(wb) {
+    if (!wb || typeof wb.eachSheet !== 'function') return;
+    wb.eachSheet(ws => {
+      ws.eachRow({ includeEmpty: false }, row => {
+        row.eachCell({ includeEmpty: false }, cell => {
+          const value = cell.value;
+          if (!value || typeof value !== 'object') return;
+          if (!Object.prototype.hasOwnProperty.call(value, 'formula') && !Object.prototype.hasOwnProperty.call(value, 'sharedFormula')) return;
+          cell.value = Object.prototype.hasOwnProperty.call(value, 'result') && value.result != null ? value.result : '';
+        });
+      });
+    });
+  }
+
   function safeUnmerge(ws, range) {
     try { ws.unMergeCells(range); } catch(e) {}
   }
@@ -1358,6 +1372,7 @@
     const buffer = await resp.arrayBuffer();
     const wb = new ExcelJS.Workbook();
     await wb.xlsx.load(buffer);
+    congelarFormulasCompartilhadasPMSP(wb);
     const ws = wb.worksheets[0];
 
     const { tenant, linhasServ, linhasPecas, aprovacaoInfo } = coletarDados(os, cli, veiculo);
@@ -1454,6 +1469,7 @@
     const buffer = await resp.arrayBuffer();
     const wb = new ExcelJS.Workbook();
     await wb.xlsx.load(buffer);
+    congelarFormulasCompartilhadasPMSP(wb);
     const ws = wb.worksheets[0];
 
     const { tenant, linhasServ, linhasPecas, aprovacaoInfo } = coletarDados(os, cli, veiculo);
@@ -1797,13 +1813,8 @@
 
       const veiculo = (window.J?.veiculos || []).find(v => v.id === os.veiculoId) || {};
       if (modo === 'itens_agrupados') {
-        let ok = false;
-        try {
-          ok = await exportarComposicaoExcelJS(os, cli, veiculo);
-        } catch (errExcelJS) {
-          console.warn('[PMSP XLSX] Template agrupado indisponivel; usando planilha propria sem formulas compartilhadas.', errExcelJS?.message || errExcelJS);
-        }
-        if (!ok) await exportarComposicaoFallbackSheetJS(os, cli, veiculo);
+        const ok = await exportarComposicaoExcelJS(os, cli, veiculo);
+        if (!ok) throw new Error('Biblioteca ExcelJS nao carregou. A planilha agrupada oficial precisa do template PMSP.');
       } else {
         const ok = await exportarComExcelJS(os, cli, veiculo);
         if (!ok) await exportarFallbackSheetJS(os, cli, veiculo);
