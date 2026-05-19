@@ -92,15 +92,15 @@
   }
   function contextoValorIA() {
     const c = rawConfig();
-    const tenantId = String(c.tenantId || c.tenant || c.valoriaTenantId || J().tenantSlug || J().slug || J().tid || 'legacy_root');
-    const legacyMode = c.legacyMode === true || c.modoLegado === true || tenantId === 'legacy_root';
-    return { config: c, firebaseConfig: firebaseConfig(c), tenantId, legacyMode };
+    const oficina = J().oficina || {};
+    const tenantId = String(c.tenantId || c.tenant || c.valoriaTenantId || oficina.slug || oficina.publicSlug || oficina.oficinaSlug || J().tenantSlug || J().slug || J().tid || '').trim();
+    return { config: c, firebaseConfig: firebaseConfig(c), tenantId, tenantOnly: true };
   }
   function basePath(ctx) {
-    return ctx.legacyMode ? '' : 'tenants/' + safeKey(ctx.tenantId) + '/';
+    return 'tenants/' + safeKey(ctx.tenantId) + '/';
   }
   function publicQuotePath(ctx, quoteId) {
-    return ctx.legacyMode ? 'publicCotacoes/' + safeKey(quoteId) : 'publicQuotes/' + safeKey(ctx.tenantId) + '/' + safeKey(quoteId);
+    return 'publicQuotes/' + safeKey(ctx.tenantId) + '/' + safeKey(quoteId);
   }
   function normalizeFornecedorBaseUrl(url) {
     let base = String(url || DEFAULT_VALORIA_BASE_URL).trim();
@@ -114,9 +114,6 @@
     const base = normalizeFornecedorBaseUrl(ctx.config.publicBaseUrl || ctx.config.baseUrl || ctx.config.fornecedorUrl || ctx.config.urlFornecedor || W.THIA_PUBLIC_LINKS?.valorIAFornecedor || W.THIA_PUBLIC_LINKS?.valorIA);
     if (!base) return '';
     const sep = base.includes('?') ? '&' : '?';
-    if (ctx.legacyMode) {
-      return base + sep + 'cotacao=' + encodeURIComponent(quoteId) + '&fornecedor=' + encodeURIComponent(supplierId) + '&legacy=1';
-    }
     return base + sep + 't=' + encodeURIComponent(ctx.tenantId) + '&q=' + encodeURIComponent(quoteId) + '&s=' + encodeURIComponent(supplierId);
   }
   function valoriaDb(ctx) {
@@ -128,6 +125,9 @@
     }
     if (!ctx.firebaseConfig || !ctx.firebaseConfig.databaseURL) {
       throw new Error('Configuração do ValorIA sem databaseURL.');
+    }
+    if (!ctx.tenantId) {
+      throw new Error('ValorIA ativo exige tenantId do Prec_IA.');
     }
     const id = safeKey(ctx.firebaseConfig.projectId || ctx.firebaseConfig.databaseURL || 'default').slice(0, 50);
     const appName = APP_PREFIX + '-' + id;
@@ -299,34 +299,24 @@
       updatedAt: nowMs(),
       signature: SIGNATURE
     };
-    if (ctx.legacyMode) {
-      updates['settings/main/name'] = meta.businessName;
-      updates['settings/main/phone'] = meta.phone;
-      updates['settings/main/managerPhone'] = meta.managerPhone;
-      updates['settings/main/city'] = meta.city;
-      updates['settings/main/owner'] = meta.responsible;
-      updates['settings/main/signature'] = SIGNATURE;
-      emails.forEach(email => { updates['adminEmails/' + safeEmail(email)] = true; });
-    } else {
-      updates['tenants/' + safeKey(ctx.tenantId) + '/meta'] = meta;
-      updates[basePath(ctx) + 'settings/name'] = meta.businessName;
-      updates[basePath(ctx) + 'settings/phone'] = meta.phone;
-      updates[basePath(ctx) + 'settings/managerPhone'] = meta.managerPhone;
-      updates[basePath(ctx) + 'settings/city'] = meta.city;
-      updates[basePath(ctx) + 'settings/owner'] = meta.responsible;
-      updates[basePath(ctx) + 'settings/niche'] = meta.niche;
-      updates[basePath(ctx) + 'settings/signature'] = SIGNATURE;
-      emails.forEach(email => {
-        updates['tenantEmailIndex/' + safeEmail(email)] = {
-          tenantId: ctx.tenantId,
-          email,
-          role: 'admin',
-          active: true,
-          source: 'thIAguinho_OFICIN_IA',
-          updatedAt: nowMs()
-        };
-      });
-    }
+    updates['tenants/' + safeKey(ctx.tenantId) + '/meta'] = meta;
+    updates[basePath(ctx) + 'settings/name'] = meta.businessName;
+    updates[basePath(ctx) + 'settings/phone'] = meta.phone;
+    updates[basePath(ctx) + 'settings/managerPhone'] = meta.managerPhone;
+    updates[basePath(ctx) + 'settings/city'] = meta.city;
+    updates[basePath(ctx) + 'settings/owner'] = meta.responsible;
+    updates[basePath(ctx) + 'settings/niche'] = meta.niche;
+    updates[basePath(ctx) + 'settings/signature'] = SIGNATURE;
+    emails.forEach(email => {
+      updates['tenantEmailIndex/' + safeEmail(email)] = {
+        tenantId: ctx.tenantId,
+        email,
+        role: 'admin',
+        active: true,
+        source: 'thIAguinho_OFICIN_IA',
+        updatedAt: nowMs()
+      };
+    });
     return updates;
   }
   function queueUpdates(ctx, payload, quote) {
@@ -342,7 +332,6 @@
       const item = {
         id: qid,
         tenantId: ctx.tenantId,
-        legacyMode: ctx.legacyMode,
         quoteId: payload.cotacaoId,
         cotacaoId: payload.cotacaoId,
         quoteNumber: quote.number,
@@ -365,7 +354,6 @@
       updates[basePath(ctx) + 'whatsappQueue/' + qid] = item;
       updates['whatsappContacts/' + phone.replace(/^55/, '')] = {
         tenantId: ctx.tenantId,
-        legacyMode: ctx.legacyMode,
         supplierId: sid,
         phone,
         lastQuoteId: payload.cotacaoId,
@@ -398,7 +386,6 @@
         valorIA: {
           quoteId: meta.quoteId,
           tenantId: meta.tenantId,
-          legacyMode: meta.legacyMode,
           queueCount: meta.queueCount,
           queues: meta.queues,
           createdAt: meta.createdAt
@@ -438,7 +425,6 @@
     const meta = {
       quoteId: payload.cotacaoId,
       tenantId: ctx.tenantId,
-      legacyMode: ctx.legacyMode,
       queueCount: queued.queues.length,
       queues: queued.queues,
       publicBaseUrl: normalizeFornecedorBaseUrl(ctx.config.publicBaseUrl || ctx.config.baseUrl || ctx.config.fornecedorUrl || ctx.config.urlFornecedor || W.THIA_PUBLIC_LINKS?.valorIAFornecedor || W.THIA_PUBLIC_LINKS?.valorIA),
@@ -458,11 +444,7 @@
     const qPath = basePath(ctx) + 'quotes/' + safeKey(quoteId);
     const qSnap = await rtdb.ref(qPath).once('value');
     const quote = qSnap.val() || {};
-    let responses = quote.responses || {};
-    if (ctx.legacyMode) {
-      const rSnap = await rtdb.ref('respostas/' + safeKey(quoteId)).once('value').catch(() => null);
-      responses = Object.assign({}, responses, (rSnap && rSnap.val()) || {});
-    }
+    const responses = quote.responses || {};
     return { quote, responses };
   }
   function responseToOption(quoteId, supplierId, itemId, resp, quote, cot) {
@@ -691,7 +673,7 @@
     return {
       enabled: enabled(),
       tenantId: ctx.tenantId,
-      legacyMode: ctx.legacyMode,
+      tenantOnly: true,
       hasFirebaseConfig: !!ctx.firebaseConfig,
       hasDatabaseURL: !!ctx.firebaseConfig?.databaseURL
     };

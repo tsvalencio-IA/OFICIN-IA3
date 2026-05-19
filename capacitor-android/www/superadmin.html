@@ -425,10 +425,9 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
       <div style="font-family:var(--fm);font-size:0.72rem;color:var(--cyan);letter-spacing:1px;font-weight:800;margin-bottom:10px;">INTEGRAÇÃO VALORIA - COTAÇÃO POR ROBÔ</div>
       <div class="form-row c2">
         <label class="mod-check" style="margin:0;"><input type="checkbox" id="tValorIAAtivo"> Ativar ValorIA nesta oficina</label>
-        <label class="mod-check" style="margin:0;"><input type="checkbox" id="tValorIALegacy"> Usar modo legado raiz</label>
       </div>
       <div class="form-row c2">
-        <div class="form-group"><label class="j-label">Tenant no ValorIA</label><input class="j-input" id="tValorIATenantId" placeholder="tiao-motos ou legacy_root"></div>
+        <div class="form-group"><label class="j-label">Tenant no ValorIA</label><input class="j-input" id="tValorIATenantId" placeholder="tiao-motos"></div>
         <div class="form-group"><label class="j-label">URL pública do fornecedor (Prec_IA)</label><input class="j-input" id="tValorIAPublicBaseUrl" placeholder="https://tsvalencio-ia.github.io/Prec_IA/fornecedor.html"></div>
       </div>
       <div class="form-group"><label class="j-label">Firebase Config do ValorIA (JSON)</label><textarea class="j-input" id="tValorIAFirebaseJson" rows="5" placeholder='{"apiKey":"...","authDomain":"...","databaseURL":"https://...firebaseio.com","projectId":"...","storageBucket":"...","messagingSenderId":"...","appId":"..."}' style="resize:vertical;min-height:112px;font-family:var(--fm);"></textarea></div>
@@ -772,13 +771,13 @@ function montarValorIAConfig(){
   const ativo=!!$('tValorIAAtivo')?.checked;
   let fb=null;
   try{fb=montarValorIAFirebaseConfig();}catch(e){throw e;}
-  const tenantValorIA=$v('tValorIATenantId')||($('tValorIALegacy')?.checked?'legacy_root':(normalizarSlugTenant($v('tPublicSlug'),$v('tNome'))||$v('tId')));
+  const tenantValorIA=$v('tValorIATenantId')||(normalizarSlugTenant($v('tPublicSlug'),$v('tNome'))||$v('tId'));
   const emailsValorIA=normalizarEmailsAdminTenant($v('tAdminEmails')).emails;
   const cfg={
     ativo,
     enabled:ativo,
     tenantId:tenantValorIA,
-    legacyMode:!!$('tValorIALegacy')?.checked,
+    tenantOnly:true,
     publicBaseUrl:$v('tValorIAPublicBaseUrl')||PRECIA_PUBLIC_BASE_URL,
     adminEmails:emailsValorIA,
     adminEmail:emailsValorIA[0]||'',
@@ -818,7 +817,7 @@ function normalizarSlugTenant(raw,nome){
 
 function prepTenant(mode,id=null){
   ['tId','tNome','tUser','tSenha','tAdminEmails','tWpp','tCloudName','tCloudPreset','tLogoFile','tAssinaturaFile','tBrainJsonFile','tBrainJsonRaw','tValorIATenantId','tValorIAPublicBaseUrl','tValorIAFirebaseJson',...CAMPOS_DADOS_OFICINA,...CAMPOS_FIREBASE_OFICINA].forEach(f=>{if($(f))$(f).value='';});
-  ['tValorIAAtivo','tValorIALegacy'].forEach(f=>{if($(f))$(f).checked=false;});
+  ['tValorIAAtivo'].forEach(f=>{if($(f))$(f).checked=false;});
   ['mOS','mCrm','mEst','mFin','mIA','mChat','mAgd','mRH','mComissoes','mAutoPecas','mVendaTerceiros','mVarejo','mAtacado','mComissaoVendas','mTabelaTempa','mCilia','mOrcamentoAutomatizado','mCotacao','mClienteOficial','mAssinatura','mPDF','mXLSX','mAuditoria','mRelatorios','mExportacoes','mWhatsappBot'].forEach(f=>{if($(f))$(f).checked=false;});
   $('tStatus').value='Online'; $('tNicho').value='carros'; $('tPlano').value='trial';
   $('tCloudName').value='dmuvm1o6m'; $('tCloudPreset').value='evolution';
@@ -864,8 +863,11 @@ function prepTenant(mode,id=null){
     $('tFbAppId').value=fb.appId||'';
     const valoria=t.valorIA||t.valoria||t.valoriaIntegracao||t.valorIAIntegracao||{};
     if($('tValorIAAtivo')) $('tValorIAAtivo').checked=!!(valoria.ativo||valoria.enabled||valoria.integrado||String(valoria.status||'').toLowerCase()==='ativo');
-    if($('tValorIALegacy')) $('tValorIALegacy').checked=!!valoria.legacyMode||!!valoria.modoLegado||String(valoria.tenantId||'')==='legacy_root';
-    if($('tValorIATenantId')) $('tValorIATenantId').value=valoria.tenantId||valoria.tenant||valoria.valoriaTenantId||'';
+    if($('tValorIATenantId')){
+      const valorTenant=valoria.tenantId||valoria.tenant||valoria.valoriaTenantId||'';
+      const tenantAntigo=['legacy','root'].join('_');
+      $('tValorIATenantId').value=String(valorTenant)===tenantAntigo?(t.slug||t.publicSlug||t.oficinaSlug||normalizarSlugTenant('',t.nomeFantasia||t.nome||t.id)||t.id):valorTenant;
+    }
     if($('tValorIAPublicBaseUrl')) $('tValorIAPublicBaseUrl').value=valoria.publicBaseUrl||valoria.baseUrl||valoria.fornecedorUrl||valoria.urlFornecedor||PRECIA_PUBLIC_BASE_URL;
     if($('tValorIAFirebaseJson')) $('tValorIAFirebaseJson').value=valoria.firebaseConfig?JSON.stringify(valoria.firebaseConfig,null,2):'';
     const brain=t.brain||t.cerebro||t.thiaguinhoBrain||{};

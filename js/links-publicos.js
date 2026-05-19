@@ -237,6 +237,12 @@
     const fone = normalizarTelefoneBR(phone);
     if (!fone) return '';
     const text = encodeURIComponent(message || '');
+    if (opts.transport === 'app') {
+      return `whatsapp://send?phone=${fone}&text=${text}`;
+    }
+    if (opts.transport === 'web') {
+      return `https://web.whatsapp.com/send?phone=${fone}&text=${text}`;
+    }
     if (opts.forceWaMe || isMobileRuntime()) {
       return `https://wa.me/${fone}?text=${text}`;
     }
@@ -244,7 +250,28 @@
   };
 
   window.thiaOpenWhatsApp = function (phone, message, opts) {
-    opts = Object.assign({ fallbackNavigate: true }, opts || {});
+    opts = Object.assign({ fallbackNavigate: true, preferDesktopApp: true, appFallbackDelayMs: 2400 }, opts || {});
+    if (opts.preferDesktopApp && !opts.forceWeb && !isMobileRuntime()) {
+      const appUrl = window.thiaBuildWhatsAppUrl(phone, message, Object.assign({}, opts, { transport: 'app' }));
+      if (appUrl) {
+        try {
+          window.location.href = appUrl;
+          if (opts.fallbackNavigate !== false) {
+            const startedAt = Date.now();
+            setTimeout(function () {
+              if (document.visibilityState === 'visible' && Date.now() - startedAt >= opts.appFallbackDelayMs) {
+                const webUrl = window.thiaBuildWhatsAppUrl(phone, message, Object.assign({}, opts, { transport: 'web' }));
+                const opened = window.open(webUrl, '_blank');
+                if (!opened && opts.fallbackNavigate) {
+                  try { window.location.href = webUrl; } catch (_) {}
+                }
+              }
+            }, opts.appFallbackDelayMs);
+          }
+          return true;
+        } catch (_) {}
+      }
+    }
     const url = window.thiaBuildWhatsAppUrl(phone, message, opts);
     if (!url) return false;
     const opened = window.open(url, '_blank');

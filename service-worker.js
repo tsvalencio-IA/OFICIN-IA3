@@ -12,7 +12,7 @@
  *
  * Powered by thIAguinho Soluções Digitais
  */
-const CACHE_VERSION = 'thiaguinho-operacional-fiscal-financeiro-20260519-45';
+const CACHE_VERSION = 'thiaguinho-operacional-fiscal-financeiro-20260519-46';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 

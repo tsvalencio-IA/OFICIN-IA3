@@ -35,6 +35,8 @@
       const st = window.thiaValorIAStatus();
       st.enabled ? pass('ValorIA ativo no tenant', JSON.stringify(st)) : warn('ValorIA ativo no tenant', JSON.stringify(st));
       st.hasDatabaseURL ? pass('ValorIA databaseURL', 'Configurado') : warn('ValorIA databaseURL', 'Nao configurado no tenant.');
+      const tenantAntigo = ['legacy', 'root'].join('_');
+      st.tenantOnly && st.tenantId && st.tenantId !== tenantAntigo ? pass('ValorIA multi-tenant obrigatorio', st.tenantId) : fail('ValorIA multi-tenant obrigatorio', JSON.stringify(st));
     } catch (e) {
       fail('ValorIA status', e.message || e);
     }
@@ -54,6 +56,8 @@
       });
     });
     links.length ? pass('Links ValorIA na O.S. aberta', links.slice(0, 5).join(' | ')) : warn('Links ValorIA na O.S. aberta', 'Ainda nao ha link ValorIA vinculado.');
+    const marcasAntigas = [['legacy', '1'].join('='), ['public', 'Cotacoes'].join(''), 'cotacao='];
+    links.some(l => marcasAntigas.some(m => String(l).includes(m))) ? fail('Links ValorIA sem legado raiz', links.join(' | ')) : pass('Links ValorIA sem legado raiz', links.length ? 'Sem parametros antigos.' : 'Sem links para validar.');
   } else {
     warn('O.S. aberta para links ValorIA', 'Abra uma O.S. no Jarvis para validar links gerados.');
   }
@@ -61,6 +65,9 @@
   const body = document.body.innerText || '';
   if (/Gemini|generativelanguage\.googleapis/i.test(body)) fail('Sem Gemini/API externa visivel', 'Texto de Gemini/API apareceu na tela.');
   else pass('Sem Gemini/API externa visivel');
+
+  const appUrl = fn('thiaBuildWhatsAppUrl') ? window.thiaBuildWhatsAppUrl('11999999999', 'teste', { transport: 'app' }) : '';
+  appUrl && /^whatsapp:\/\/send\?/.test(appUrl) ? pass('WhatsApp desktop app preparado', appUrl) : warn('WhatsApp desktop app preparado', 'thiaBuildWhatsAppUrl app indisponivel nesta tela.');
 
   console.table(out);
   const falhas = out.filter(x => x.status === 'FALHA').length;
