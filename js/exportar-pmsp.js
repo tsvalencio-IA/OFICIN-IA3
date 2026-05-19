@@ -1348,6 +1348,103 @@
     return { tenant, linhasServ, linhasPecas, linhasServOriginal, linhasPecasOriginal, descMO, descPeca, guincho, aprovacaoInfo }; 
   }
 
+
+  async function exportarComposicaoExcelJS(os, cli, veiculo) {
+    if (typeof ExcelJS === 'undefined') return false;
+
+    const templateUrl = templatePMSPUrl();
+    const resp = await fetch(templateUrl, { cache: 'no-store' });
+    if (!resp.ok) throw new Error('Modelo PMSP nao encontrado: ' + templateUrl);
+    const buffer = await resp.arrayBuffer();
+    const wb = new ExcelJS.Workbook();
+    await wb.xlsx.load(buffer);
+    const ws = wb.worksheets[0];
+
+    const { tenant, linhasServ, linhasPecas, aprovacaoInfo } = coletarDados(os, cli, veiculo);
+    const assinaturaExportar = await obterAssinaturaExportar(os, tenant);
+    const logoExportar = await obterLogoOficinaExportar(os, tenant);
+    const resumoSecoes = resumirSecoes(linhasServ);
+    const dc = dadosCliente(cli, os);
+    const dv = dadosVeiculo(veiculo, os);
+    const dt = dadosTenant(tenant);
+    const representante = dt.representante;
+
+    const composicaoRows = contarLinhasComposicaoOS(linhasPecas, linhasServ);
+    const kpiFinalRows = contarLinhasKPIFinais(resumoSecoes);
+    const aprovacaoRows = contarLinhasAprovacaoExportar(aprovacaoInfo);
+    const blocoRows = Math.max(1, composicaoRows + kpiFinalRows + aprovacaoRows);
+    ws.spliceRows(18, PECA_TOTAL - 18 + 1, ...Array.from({ length: blocoRows }, () => []));
+
+    const totalGeralRow = 18 + blocoRows;
+    const vistoriaRow = totalGeralRow + 1;
+    const resumoPecasRow = totalGeralRow + 2;
+    const resumoMORow = totalGeralRow + 3;
+    const resumoTotalRow = totalGeralRow + 4;
+    const contratoRow = totalGeralRow + 5;
+    const dataRow = totalGeralRow + 6;
+    const representanteRow = totalGeralRow + 10;
+
+    const cabecalho = dc.cabecalho || 'SECRETARIA DA SEGURANCA PUBLICA\nPOLICIA MILITAR DO ESTADO DE SAO PAULO';
+    setCell(ws, 'B1', formatarCabecalhoPM(cabecalho));
+    ws.getCell('B1').alignment = { ...(ws.getCell('B1').alignment || {}), vertical: 'middle', horizontal: 'left', wrapText: true, shrinkToFit: true };
+    setCell(ws, 'A3', `REFERENCIA: ORDEM E EXECUCAO DE SERVICOS No ${oesNumero(cli, os)}`);
+    setCell(ws, 'A5', `MARCA: ${dv.marca}`);
+    setCell(ws, 'C5', `MODELO: ${dv.modelo}`);
+    setCell(ws, 'E5', `ANO: ${dv.ano}`);
+    setCell(ws, 'G5', `PLACA: ${dv.placa}`);
+    setCell(ws, 'A6', `CHASSIS: ${dv.chassis}`);
+    setCell(ws, 'D6', `PATRIMONIO: ${dv.patrimonio}`);
+    setCell(ws, 'A7', `KM: ${dv.km}`);
+    setCell(ws, 'C7', `PREFIXO: ${dv.prefixo}`);
+    setCell(ws, 'E7', `OPM DETENTORA: ${dc.unidade}`);
+    setCell(ws, 'A9', `RAZAO SOCIAL : ${dt.razaoSocial}`);
+    setCell(ws, 'E9', `CNPJ: ${dt.cnpj}`);
+    setCell(ws, 'A10', `ENDERECO: ${dt.endereco}`);
+    setCell(ws, 'A11', `TELEFONE: ${dt.telefone}`);
+    setCell(ws, 'D11', `ORCAMENTISTA: ${dt.orcamentista}`);
+    setCell(ws, 'A12', `REPRESENTANTE LEGAL: ${representante}`);
+    setCell(ws, 'A14', `UNIDADE : ${dc.unidade}`);
+    setCell(ws, 'E14', `CNPJ: ${dc.doc}`);
+    setCell(ws, 'A15', `ENDERECO: ${dc.endereco}`);
+    setCell(ws, 'A17', `FISCAL DO CONTRATO: ${dc.fiscal}`);
+    aplicarAjustesCabecalho(ws);
+    await inserirLogoOficinaExcelJS(wb, ws, logoExportar);
+
+    inserirComposicaoOS(ws, 18, linhasPecas, linhasServ);
+    inserirKPIsFinaisOS(ws, 18 + composicaoRows, linhasPecas, linhasServ, resumoSecoes);
+    inserirResumoAprovacaoExportar(ws, 18 + composicaoRows + kpiFinalRows, aprovacaoInfo);
+
+    const totalPecas = linhasPecas.reduce((sum, p) => sum + p.total, 0);
+    const totalMO = linhasServ.reduce((sum, item) => sum + item.total, 0);
+    const contrato = +(totalPecas + totalMO).toFixed(2);
+    prepararRodape(ws, [totalGeralRow, vistoriaRow, resumoPecasRow, resumoMORow, resumoTotalRow, contratoRow, dataRow, representanteRow]);
+    linhaResumoValor(ws, totalGeralRow, 'TOTAL GERAL', 0, { blankValue: true });
+    linhaResumoValor(ws, vistoriaRow, 'VALOR DA VISTORIA TECNICA COMPLEMENTAR AO ESCOPO DE SERVICOS', 0, { blankValue: true });
+    linhaResumoValor(ws, resumoPecasRow, 'VALOR TOTAL DE PECAS', totalPecas);
+    linhaResumoValor(ws, resumoMORow, 'VALOR TOTAL DE MAO DE OBRA', totalMO);
+    linhaResumoValor(ws, resumoTotalRow, aprovacaoInfo?.ativa ? 'TOTAL APROVADO' : 'TOTAL GERAL', contrato);
+    linhaResumoValor(ws, contratoRow, aprovacaoInfo?.ativa ? 'VALOR APROVADO / CONTRATO' : 'VALOR DO CONTRATO', contrato, { contrato: true });
+    setCell(ws, 'A' + dataRow, dataExtenso(dt.cidade || dc.cidade));
+    setCell(ws, 'A' + representanteRow, String(representante).toUpperCase());
+    await inserirAssinaturaExcelJS(wb, ws, assinaturaExportar, representanteRow);
+
+    ws.pageSetup = {
+      ...ws.pageSetup,
+      orientation: 'portrait',
+      fitToPage: true,
+      fitToWidth: 1,
+      fitToHeight: 0,
+      printArea: `A1:H${representanteRow + 3}`
+    };
+
+    const fname = `${(dv.prefixo || String(os.id || '').slice(-6).toUpperCase() || 'OS')}_ITENS_AGRUPADOS.xlsx`;
+    const out = await wb.xlsx.writeBuffer();
+    const blob = new Blob([out], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    await salvarArquivoBlobExportar(blob, fname);
+    window.toast?.(`Itens agrupados PMSP exportados: ${fname}`, 'ok');
+    return true;
+  }
+
   async function exportarComExcelJS(os, cli, veiculo) {
     if (typeof ExcelJS === 'undefined') return false;
 
@@ -1606,7 +1703,85 @@
     window.toast?.('ExcelJS nao carregou; exportado em modo compatibilidade.', 'warn');
   }
 
-  window.exportarOrcamentoPMSP = async function() {
+
+  async function exportarComposicaoFallbackSheetJS(os, cli, veiculo) {
+    if (typeof XLSX === 'undefined') throw new Error('Biblioteca XLSX nao carregou.');
+    const { tenant, linhasServ, linhasPecas, aprovacaoInfo } = coletarDados(os, cli, veiculo);
+    const resumoSecoes = resumirSecoes(linhasServ);
+    const dc = dadosCliente(cli, os);
+    const dv = dadosVeiculo(veiculo, os);
+    const dt = dadosTenant(tenant);
+    const rows = [
+      [dc.cabecalho || 'SECRETARIA DA SEGURANCA PUBLICA POLICIA MILITAR DO ESTADO DE SAO PAULO'],
+      ['PLANILHA DE COMPOSICAO DE CUSTOS'],
+      [`REFERENCIA: ORDEM E EXECUCAO DE SERVICOS No ${oesNumero(cli, os)}`],
+      ['DADOS DA VIATURA'],
+      [`MARCA: ${dv.marca}`, `MODELO: ${dv.modelo}`, `ANO: ${dv.ano}`, `PLACA: ${dv.placa}`],
+      [`CHASSIS: ${dv.chassis}`, `PATRIMONIO: ${dv.patrimonio}`],
+      [`KM: ${dv.km}`, `PREFIXO: ${dv.prefixo}`, `OPM DETENTORA: ${dc.unidade}`],
+      ['DADOS DA EMPRESA'],
+      [`RAZAO SOCIAL: ${dt.razaoSocial}`, `CNPJ: ${dt.cnpj}`],
+      [`ENDERECO: ${dt.endereco}`],
+      [`TELEFONE: ${dt.telefone}`, `ORCAMENTISTA: ${dt.orcamentista}`],
+      [`REPRESENTANTE LEGAL: ${dt.representante}`],
+      ['DADOS DO CLIENTE'],
+      [`UNIDADE: ${dc.unidade}`, `CNPJ: ${dc.doc}`],
+      [`ENDERECO: ${dc.endereco}`],
+      [`FISCAL DO CONTRATO: ${dc.fiscal}`],
+      [],
+      ['COMPOSICAO DA O.S. POR PECA E SERVICO VINCULADO'],
+      ['ITEM / CODIGO','DESCRICAO','QTD/H','UNIT./R$/H','DESC.','TOTAL']
+    ];
+    const composicao = agruparComposicaoOS(linhasPecas, linhasServ);
+    composicao.grupos.forEach(g => {
+      const p = g.peca;
+      rows.push([textoItemPeca(p), p.desc, p.qtd, p.valorUnit, p.descPct, p.total]);
+      g.servicos.forEach(item => rows.push([textoItemServico(item), item.desc, item.tempo, item.valorHora, item.descPct, item.total]));
+    });
+    if (composicao.soltos.length) {
+      rows.push(['SERVICOS GERAIS / SEM PECA VINCULADA']);
+      composicao.soltos.forEach(item => rows.push([textoItemServico(item), item.desc, item.tempo, item.valorHora, item.descPct, item.total]));
+    }
+    const brutoPecas = linhasPecas.reduce((sum, p) => sum + n(p.bruto || 0), 0);
+    const liquidoPecas = linhasPecas.reduce((sum, p) => sum + n(p.total || 0), 0);
+    const brutoMO = linhasServ.reduce((sum, item) => sum + n(item.bruto || 0), 0);
+    const liquidoMO = linhasServ.reduce((sum, item) => sum + n(item.total || 0), 0);
+    const horasMO = linhasServ.reduce((sum, item) => sum + n(item.tempo || 0), 0);
+    const total = +(liquidoPecas + liquidoMO).toFixed(2);
+    rows.push([]);
+    rows.push(['KPIs FINAIS DA O.S.']);
+    rows.push(['QTDE / VALOR BRUTO DE PECAS', `${linhasPecas.length} peca(s)`, '', '', '', brutoPecas]);
+    rows.push(['VALOR LIQUIDO DE PECAS', '', '', '', '', liquidoPecas]);
+    rows.push(['QTDE / VALOR BRUTO DE SERVICOS', `${linhasServ.length} servico(s) - ${horasMO.toFixed(2).replace('.', ',')} h`, '', '', '', brutoMO]);
+    rows.push(['VALOR LIQUIDO DE MAO DE OBRA', '', '', '', '', liquidoMO]);
+    rows.push(['TOTAL LIQUIDO / CONTRATO', '', '', '', '', total]);
+    rows.push(['TOTAL DE HORAS DE MAO DE OBRA', `${horasMO.toFixed(2).replace('.', ',')} h`, '', '', '', 0]);
+    rows.push(['TOTAL DE ITENS NA O.S.', `${linhasPecas.length} peca(s) + ${linhasServ.length} servico(s)`, '', '', '', total]);
+    if (resumoSecoes.length) {
+      rows.push([]);
+      rows.push(['RESUMO FINAL POR TIPO / SECAO DO SERVICO', '', '', '', 'HORAS', 'VALOR']);
+      resumoSecoes.forEach(([secao, item]) => rows.push([textoResumoSecao(secao, item), '', '', '', item.horas, item.total]));
+    }
+    if (aprovacaoInfo?.naoAprovados?.length) {
+      rows.push([]);
+      rows.push(['ITENS NAO APROVADOS - HISTORICO DO ORCAMENTO ORIGINAL']);
+      rows.push(['TIPO / CODIGO','DESCRICAO','QTD/H','UNIT./R$/H','DESC.','TOTAL ORIGINAL']);
+      aprovacaoInfo.naoAprovados.forEach(it => rows.push([it.labelTipo || it.tipo, it.desc || '-', it.tipo === 'peca' ? (it.qtd || 1) : (it.tempo || 0), it.valorUnit || it.valorHora || 0, 'NAO APROVADO', it.valorFinal || 0]));
+    }
+    rows.push([aprovacaoInfo?.ativa ? 'VALOR APROVADO / CONTRATO' : 'VALOR DO CONTRATO', '', '', '', '', total]);
+    rows.push([dataExtenso(dt.cidade || dc.cidade)]);
+
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Plan1');
+    const fname = `${(dv.prefixo || String(os.id || '').slice(-6).toUpperCase() || 'OS')}_ITENS_AGRUPADOS.xlsx`;
+    const out = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([out], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    await salvarArquivoBlobExportar(blob, fname);
+    window.toast?.('ExcelJS nao carregou; itens agrupados exportados em modo compatibilidade.', 'warn');
+  }
+
+  async function exportarOrcamentoPMSPModo(modo) {
     try {
       const osId = document.getElementById('osId')?.value;
       if (!osId) { window.toast?.('Salve a O.S. antes de exportar.', 'warn'); return; }
@@ -1621,12 +1796,25 @@
       }
 
       const veiculo = (window.J?.veiculos || []).find(v => v.id === os.veiculoId) || {};
-      const ok = await exportarComExcelJS(os, cli, veiculo);
-      if (!ok) await exportarFallbackSheetJS(os, cli, veiculo);
+      if (modo === 'itens_agrupados') {
+        const ok = await exportarComposicaoExcelJS(os, cli, veiculo);
+        if (!ok) await exportarComposicaoFallbackSheetJS(os, cli, veiculo);
+      } else {
+        const ok = await exportarComExcelJS(os, cli, veiculo);
+        if (!ok) await exportarFallbackSheetJS(os, cli, veiculo);
+      }
     } catch (e) {
       console.error('[PMSP XLSX]', e);
       window.toast?.('Erro ao exportar PMSP: ' + e.message, 'err');
     }
+  }
+
+  window.exportarOrcamentoPMSP = async function() {
+    return exportarOrcamentoPMSPModo('completo');
+  };
+
+  window.exportarOrcamentoPMSPItens = async function() {
+    return exportarOrcamentoPMSPModo('itens_agrupados');
   };
 
 

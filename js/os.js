@@ -1444,6 +1444,10 @@ window.prepOS = function(mode, id = null) {
       const ehGov = typeof window._osClienteGovernamental === 'function' && window._osClienteGovernamental();
       $('btnExportarPMSP').style.display = ehGov ? 'block' : 'none';
       $('btnExportarPMSP').dataset.osId = id;
+      if ($('btnExportarPMSPItens')) {
+        $('btnExportarPMSPItens').style.display = ehGov ? 'block' : 'none';
+        $('btnExportarPMSPItens').dataset.osId = id;
+      }
     }
   }
   setTimeout(() => window.scrollOSModal?.('top'), 80);
@@ -4253,8 +4257,8 @@ function _ciliaNormGrupo(v) {
 function _ciliaGrupoSistemaPeca(peca) {
   const txt = _ciliaNormGrupo([peca?.desc, peca?.descricao, peca?.grupo, peca?.categoria, peca?.sistema, peca?.tipo, peca?.area, peca?.secao, peca?.codigo].filter(Boolean).join(' '));
   const grupos = [
-    { nome: 'SUSPENSAO', ordem: 10, rx: /\b(amortec|batente|coifa|mola|bandeja|balanca|bieleta|pivo|barra estabil|coxim amort|terminal|axial)\b/ },
-    { nome: 'FREIO', ordem: 20, rx: /\b(freio|pastilha|disco|tambor|sapata|cilindro|pinca|flexivel|abs)\b/ },
+    { nome: 'SUSPENSAO', ordem: 10, rx: /\b(amortec|batente|coifa|mola|bandeja|balanca|bieleta|pivo|bucha|barra estabil|estabilizador|estabilizadora|coxim amort|terminal|axial|tensor|tirante)\b/ },
+    { nome: 'FREIO', ordem: 20, rx: /\b(freio|pastilha|disco|tambor|sapata|cilindro|pinca|pin[cç]a|flexivel|fluido|servo freio|hidrovacuo|abs)\b/ },
     { nome: 'DIRECAO', ordem: 30, rx: /\b(direcao|caixa direcao|barra direcao|terminal direcao|coluna direcao)\b/ },
     { nome: 'RODAS / PNEUS', ordem: 40, rx: /\b(pneu|roda|cubo|rolamento|calota)\b/ },
     { nome: 'MOTOR / ALIMENTACAO', ordem: 50, rx: /\b(motor|coxim motor|bomba combust|injecao|bico|vela|correia|filtro|oleo)\b/ },
@@ -4323,6 +4327,14 @@ function _ciliaGrupoBadgeHTML(peca, destaque) {
     <span>${destaque ? 'GRUPO ' : ''}${escOS(peca.ciliaGrupo)}</span>
     ${peca.ciliaAgrupador ? `<small style="color:var(--muted);font-size:.54rem;text-transform:none;">${escOS(peca.ciliaAgrupador)}</small>` : ''}
   </div>`;
+}
+
+function _ciliaDeveAbrirGrupoRender(peca) {
+  const container = typeof $ === 'function' ? $('containerPecasOS') : document.getElementById('containerPecasOS');
+  const wraps = container ? Array.from(container.querySelectorAll('.cilia-peca-wrap')) : [];
+  const anterior = wraps.length ? wraps[wraps.length - 1] : null;
+  const grupoAtual = String(peca?.ciliaGrupo || '');
+  return !anterior || String(anterior.dataset?.ciliaGrupo || '') !== grupoAtual;
 }
 
 async function _ciliaAdicionarPecas(pecas) {
@@ -4831,7 +4843,7 @@ window.renderCiliaPecaOSRow = function(p, servicosRelacionados = []) {
   wrap.dataset.ciliaAgrupador = p.ciliaAgrupador || '';
   wrap.dataset.ciliaPosicaoOrdem = String(p.ciliaPosicaoOrdem ?? '');
   wrap.style.cssText = 'border:1px solid rgba(0,212,255,0.18);border-radius:6px;padding:8px;margin-bottom:8px;background:rgba(0,212,255,0.035);';
-  wrap.insertAdjacentHTML('beforeend', _ciliaGrupoBadgeHTML(p, false));
+  wrap.insertAdjacentHTML('beforeend', _ciliaGrupoBadgeHTML(p, p.ciliaAbreGrupo === true || _ciliaDeveAbrirGrupoRender(p)));
 
   const qtd = numBR(p.qtd || p.q || 1) || 1;
   const vBruto = numBR(p.venda || p.v || p.ciliaBruto || 0);

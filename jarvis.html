@@ -1484,6 +1484,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
   <div class="modal-foot">
     <button class="btn-ghost" id="btnGerarPDFOS" style="display:none;" onclick="window.gerarPDFOS()">📄 EXPORTAR LAUDO PDF</button>
     <button class="btn-ghost" id="btnExportarPMSP" style="display:none;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.4);color:#A78BFA;" onclick="window.exportarOrcamentoPMSP()">🛡 EXPORTAR ORÇAMENTO PMSP (XLSX)</button>
+    <button class="btn-ghost" id="btnExportarPMSPItens" style="display:none;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.36);color:#7DD3FC;" onclick="window.exportarOrcamentoPMSPItens()">📋 EXPORTAR ITENS AGRUPADOS (XLSX)</button>
     <button class="btn-ghost" id="btnExcluirOS" style="display:none;background:transparent;border:1px solid var(--danger);color:var(--danger);" onclick="window._excluirOSDoModal()">🗑 EXCLUIR O.S.</button>
     <button class="btn-ghost" onclick="fecharModal('modalOS')">CANCELAR</button>
     <button class="btn-outline" id="btnSalvarContinuarOS" style="border-color:rgba(0,255,136,.45);color:var(--success);" onclick="window.salvarOSContinuar && window.salvarOSContinuar()">💾 SALVAR E CONTINUAR</button>
