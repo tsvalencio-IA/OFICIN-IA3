@@ -1009,10 +1009,35 @@
     return { grupos, soltos };
   }
 
+  function secaoGrupoComposicao(grupo) {
+    const servicoBase = (grupo.servicos || [])[0];
+    if (servicoBase) return classificarSecao(servicoBase);
+    const p = grupo.peca || {};
+    return classificarSecao({
+      sistema: p.ciliaGrupo || p.ciliaAgrupador || '',
+      desc: [p.desc, p.ciliaGrupo, p.ciliaAgrupador].filter(Boolean).join(' ')
+    });
+  }
+
+  function agruparComposicaoPorSecao(grupos, soltos) {
+    const mapa = new Map();
+    function secaoItem(nome) {
+      const key = limparTexto(nome || 'OUTROS SERVICOS') || 'OUTROS SERVICOS';
+      if (!mapa.has(key)) mapa.set(key, { secao: key, grupos: [], soltos: [] });
+      return mapa.get(key);
+    }
+    (grupos || []).forEach(g => secaoItem(secaoGrupoComposicao(g)).grupos.push(g));
+    (soltos || []).forEach(s => secaoItem(classificarSecao(s)).soltos.push(s));
+    return Array.from(mapa.values());
+  }
+
   function contarLinhasComposicaoOS(linhasPecas, linhasServ) {
     if (!(linhasPecas || []).length && !(linhasServ || []).length) return 0;
     const { grupos, soltos } = agruparComposicaoOS(linhasPecas, linhasServ);
-    return 2 + grupos.reduce((sum, g) => sum + 1 + g.servicos.length, 0) + (soltos.length ? 1 + soltos.length : 0);
+    const secoes = agruparComposicaoPorSecao(grupos, soltos);
+    return 2 + secoes.reduce((sum, sec) => {
+      return sum + 1 + sec.grupos.reduce((soma, g) => soma + 1 + g.servicos.length, 0) + sec.soltos.length;
+    }, 0);
   }
 
   function bordarLinhaOS(ws, row, tipo) {
@@ -1077,7 +1102,7 @@
     return linhas.join('\n');
   }
 
-  function inserirComposicaoOS(ws, startRow, linhasPecas, linhasServ) {
+  function inserirComposicaoOSAntigo(ws, startRow, linhasPecas, linhasServ) {
     const totalRows = contarLinhasComposicaoOS(linhasPecas, linhasServ);
     if (!totalRows) return 0;
     const { grupos, soltos } = agruparComposicaoOS(linhasPecas, linhasServ);
@@ -1134,6 +1159,68 @@
         row++;
       });
     }
+    return totalRows;
+  }
+
+  function inserirComposicaoOS(ws, startRow, linhasPecas, linhasServ) {
+    const totalRows = contarLinhasComposicaoOS(linhasPecas, linhasServ);
+    if (!totalRows) return 0;
+    const { grupos, soltos } = agruparComposicaoOS(linhasPecas, linhasServ);
+    const secoes = agruparComposicaoPorSecao(grupos, soltos);
+    let row = startRow;
+    tituloBlocoOS(ws, row++, 'COMPOSIÇÃO DA O.S. POR PEÇA E SERVIÇO VINCULADO');
+    inserirCabecalhoComposicaoOS(ws, row++);
+
+    secoes.forEach(sec => {
+      limparRangeResumo(ws, row);
+      safeUnmerge(ws, `B${row}:H${row}`);
+      safeMerge(ws, `B${row}:H${row}`);
+      setCell(ws, 'B' + row, 'SEÇÃO: ' + sec.secao);
+      ws.getCell('B' + row).alignment = { horizontal: 'left', vertical: 'middle', wrapText: true, shrinkToFit: true };
+      bordarLinhaOS(ws, row, 'grupo');
+      ws.getRow(row).height = 18;
+      row++;
+
+      sec.grupos.forEach(g => {
+        const p = g.peca;
+        limparRangeResumo(ws, row);
+        setCell(ws, 'B' + row, textoItemPeca(p));
+        setCell(ws, 'D' + row, p.desc || 'PEÇA SEM DESCRIÇÃO');
+        setNumberCell(ws, 'E' + row, p.qtd, '0.##');
+        setMoneyCell(ws, 'F' + row, p.valorUnit);
+        setPercentCell(ws, 'G' + row, p.descPct);
+        setMoneyCell(ws, 'H' + row, p.total);
+        bordarLinhaOS(ws, row, 'peca');
+        ws.getRow(row).height = Math.max(24, 13 * String(ws.getCell('B' + row).value || '').split('\n').length);
+        row++;
+
+        g.servicos.forEach(s => {
+          limparRangeResumo(ws, row);
+          setCell(ws, 'B' + row, textoItemServico(s));
+          setCell(ws, 'D' + row, s.desc || 'SERVIÇO SEM DESCRIÇÃO');
+          setNumberCell(ws, 'E' + row, s.tempo, '0.00');
+          setMoneyCell(ws, 'F' + row, s.valorHora);
+          setPercentCell(ws, 'G' + row, s.descPct);
+          setMoneyCell(ws, 'H' + row, s.total);
+          bordarLinhaOS(ws, row, 'servico');
+          ws.getRow(row).height = Math.max(28, 12 * String(ws.getCell('B' + row).value || '').split('\n').length);
+          row++;
+        });
+      });
+
+      sec.soltos.forEach(s => {
+        limparRangeResumo(ws, row);
+        setCell(ws, 'B' + row, textoItemServico(s));
+        setCell(ws, 'D' + row, s.desc || 'SERVIÇO SEM DESCRIÇÃO');
+        setNumberCell(ws, 'E' + row, s.tempo, '0.00');
+        setMoneyCell(ws, 'F' + row, s.valorHora);
+        setPercentCell(ws, 'G' + row, s.descPct);
+        setMoneyCell(ws, 'H' + row, s.total);
+        bordarLinhaOS(ws, row, 'servico');
+        ws.getRow(row).height = Math.max(28, 12 * String(ws.getCell('B' + row).value || '').split('\n').length);
+        row++;
+      });
+    });
     return totalRows;
   }
 
@@ -1378,16 +1465,13 @@
     const { tenant, linhasServ, linhasPecas, aprovacaoInfo } = coletarDados(os, cli, veiculo);
     const assinaturaExportar = await obterAssinaturaExportar(os, tenant);
     const logoExportar = await obterLogoOficinaExportar(os, tenant);
-    const resumoSecoes = resumirSecoes(linhasServ);
     const dc = dadosCliente(cli, os);
     const dv = dadosVeiculo(veiculo, os);
     const dt = dadosTenant(tenant);
     const representante = dt.representante;
 
     const composicaoRows = contarLinhasComposicaoOS(linhasPecas, linhasServ);
-    const kpiFinalRows = contarLinhasKPIFinais(resumoSecoes);
-    const aprovacaoRows = contarLinhasAprovacaoExportar(aprovacaoInfo);
-    const blocoRows = Math.max(1, composicaoRows + kpiFinalRows + aprovacaoRows);
+    const blocoRows = Math.max(1, composicaoRows);
     ws.spliceRows(18, PECA_TOTAL - 18 + 1, ...Array.from({ length: blocoRows }, () => []));
 
     const totalGeralRow = 18 + blocoRows;
@@ -1426,8 +1510,6 @@
     await inserirLogoOficinaExcelJS(wb, ws, logoExportar);
 
     inserirComposicaoOS(ws, 18, linhasPecas, linhasServ);
-    inserirKPIsFinaisOS(ws, 18 + composicaoRows, linhasPecas, linhasServ, resumoSecoes);
-    inserirResumoAprovacaoExportar(ws, 18 + composicaoRows + kpiFinalRows, aprovacaoInfo);
 
     const totalPecas = linhasPecas.reduce((sum, p) => sum + p.total, 0);
     const totalMO = linhasServ.reduce((sum, item) => sum + item.total, 0);
