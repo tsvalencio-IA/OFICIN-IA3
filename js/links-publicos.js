@@ -249,8 +249,41 @@
     return `https://web.whatsapp.com/send?phone=${fone}&text=${text}`;
   };
 
+  function confirmarFallbackWebWhatsApp(opts) {
+    if (opts.confirmWebFallback === false) return true;
+    try {
+      return window.confirm('O WhatsApp app nao abriu ou foi cancelado. Deseja abrir o WhatsApp Web no navegador?');
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function abrirWhatsAppWebOpcional(url, opts) {
+    if (!url) return false;
+    if (!confirmarFallbackWebWhatsApp(opts)) {
+      window.toast?.('WhatsApp Web nao aberto. Voce continuou no SaaS.', 'warn');
+      return false;
+    }
+    const opened = window.open(url, '_blank', 'noopener');
+    if (opened) {
+      try { opened.focus(); } catch (_) {}
+      return true;
+    }
+    if (opts.allowSameTabFallback === true && opts.fallbackNavigate !== false) {
+      try { window.location.href = url; return true; } catch (_) {}
+    }
+    window.toast?.('O navegador bloqueou o WhatsApp Web. Use a opcao de abrir pelo navegador quando quiser.', 'warn');
+    return false;
+  }
+
   window.thiaOpenWhatsApp = function (phone, message, opts) {
-    opts = Object.assign({ fallbackNavigate: true, preferDesktopApp: true, appFallbackDelayMs: 2400 }, opts || {});
+    opts = Object.assign({
+      fallbackNavigate: true,
+      preferDesktopApp: true,
+      confirmWebFallback: true,
+      appFallbackDelayMs: 2400,
+      allowSameTabFallback: false
+    }, opts || {});
     if (opts.preferDesktopApp && !opts.forceWeb && !isMobileRuntime()) {
       const appUrl = window.thiaBuildWhatsAppUrl(phone, message, Object.assign({}, opts, { transport: 'app' }));
       if (appUrl) {
@@ -261,10 +294,7 @@
             setTimeout(function () {
               if (document.visibilityState === 'visible' && Date.now() - startedAt >= opts.appFallbackDelayMs) {
                 const webUrl = window.thiaBuildWhatsAppUrl(phone, message, Object.assign({}, opts, { transport: 'web' }));
-                const opened = window.open(webUrl, '_blank');
-                if (!opened && opts.fallbackNavigate) {
-                  try { window.location.href = webUrl; } catch (_) {}
-                }
+                abrirWhatsAppWebOpcional(webUrl, opts);
               }
             }, opts.appFallbackDelayMs);
           }
@@ -274,13 +304,15 @@
     }
     const url = window.thiaBuildWhatsAppUrl(phone, message, opts);
     if (!url) return false;
-    const opened = window.open(url, '_blank');
+    const opened = window.open(url, '_blank', 'noopener');
     if (opened) {
       try { opened.focus(); } catch (_) {}
       return true;
     }
-    if (opts.fallbackNavigate) {
+    if (opts.allowSameTabFallback === true && opts.fallbackNavigate !== false) {
       try { window.location.href = url; } catch (_) {}
+    } else if (opts.fallbackNavigate !== false) {
+      window.toast?.('O navegador bloqueou a abertura do WhatsApp. A tela atual foi preservada.', 'warn');
     }
     return false;
   };

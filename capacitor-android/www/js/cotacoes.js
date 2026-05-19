@@ -329,6 +329,17 @@
     }
     return 'cotacao.html?' + new URLSearchParams(params).toString();
   }
+  function valorIAStatusCotacao() {
+    try {
+      return typeof W.thiaValorIAStatus === 'function' ? W.thiaValorIAStatus() : null;
+    } catch (_) {
+      return null;
+    }
+  }
+  function valorIAAtivoCotacao() {
+    const st = valorIAStatusCotacao();
+    return !!(st && st.enabled && st.tenantId && st.hasDatabaseURL);
+  }
   function osRefLabel(os) {
     return 'OS #' + String(os?.numero || os?.id || '').slice(-6).toUpperCase();
   }
@@ -403,6 +414,7 @@
               <textarea class="j-textarea" id="cotRfqObs" rows="3" placeholder="Ex: confirmar marca, modelo, prazo real, frete e disponibilidade para retirada/entrega."></textarea>
             </div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px;">
+              ${valorIAAtivoCotacao() ? '<button type="button" class="btn-primary" onclick="window.enviarCotacaoPreciaOS()">ENVIAR PARA PREC_IA / ROBO</button>' : ''}
               <button type="button" class="btn-primary" onclick="window.gerarEnvioCotacaoOS()">GERAR MENSAGENS DOS SELECIONADOS</button>
               <button type="button" class="btn-outline" onclick="window.exportarCotacaoFornecedoresOS()">EXPORTAR ANÁLISE COM RESPOSTAS</button>
               <small id="cotRfqAvisoBase" style="font-family:var(--fm);font-size:.62rem;color:var(--muted);"></small>
@@ -1150,6 +1162,37 @@ ${linhasItens || '<section class="item"><div class="empty">Nenhuma peça de cota
     } catch (err) {
       console.warn(err);
       W.toast?.('Nao foi possivel exportar a analise de cotacao.', 'warn');
+    }
+  };
+
+  W.enviarCotacaoPreciaOS = async function () {
+    const st = valorIAStatusCotacao();
+    if (!valorIAAtivoCotacao()) {
+      const detalhe = st && st.enabled && !st.hasDatabaseURL
+        ? ' Banco Prec_IA sem databaseURL configurado.'
+        : '';
+      W.toast?.('Prec_IA/robo nao esta ativo para esta oficina.' + detalhe, 'warn');
+      return;
+    }
+    if (typeof W.thiaValorIAAfterSalvarCotacao !== 'function') {
+      W.toast?.('Integracao Prec_IA nao carregada nesta tela.', 'warn');
+      return;
+    }
+    const lista = selecionados();
+    if (!lista.length) { W.toast?.('Selecione pelo menos um fornecedor.', 'warn'); return; }
+    try {
+      const payload = await salvarSolicitacao(lista);
+      renderMensagens(payload);
+      if (payload.valorIA?.queueCount) {
+        W.toast?.('Prec_IA: cotacao criada e fornecedores enviados para a fila do robo.', 'ok');
+      } else if (payload.valorIA) {
+        W.toast?.('Prec_IA publicou a cotacao, mas nenhum fornecedor tinha WhatsApp valido para fila do robo.', 'warn');
+      } else {
+        W.toast?.('Cotacao criada, mas o Prec_IA nao retornou fila. Verifique a configuracao do tenant.', 'warn');
+      }
+    } catch (err) {
+      console.error(err);
+      W.toast?.('Nao foi possivel enviar para Prec_IA: ' + (err.message || err), 'err');
     }
   };
 
