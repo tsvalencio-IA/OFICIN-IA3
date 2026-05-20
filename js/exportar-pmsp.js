@@ -48,6 +48,36 @@
     ws.spliceRows(startRow, removeCount, ...Array.from({ length: Math.max(1, linhasAgrupadas) }, () => []));
   }
 
+  function limparBlocoAssinaturaAgrupada(ws, labelRow, representanteRow) {
+    // A linha labelRow tambem carrega "VALOR DO CONTRATO" em B:H, entao preserva B:H nela.
+    for (let r = labelRow + 1; r <= representanteRow + 3; r++) {
+      safeUnmergeOverlaps(ws, `B${r}:H${r}`);
+      ['B','C','D','E','F','G','H'].forEach(col => setCell(ws, col + r, ''));
+    }
+  }
+
+  function limparLinhasAbaixoExportar(ws, keepUntil) {
+    const lastUsed = Math.max(ultimaLinhaUsadaExportar(ws), ws.rowCount || 0, PECA_TOTAL);
+    mergeRanges(ws).forEach(item => {
+      if (item.decoded.top > keepUntil || item.decoded.bottom > keepUntil) {
+        try { ws.unMergeCells(item.range); } catch(e) {}
+      }
+    });
+    for (let r = keepUntil + 1; r <= lastUsed; r++) {
+      const row = ws.getRow(r);
+      row.values = [];
+      row.hidden = true;
+      ['A','B','C','D','E','F','G','H'].forEach(col => {
+        const cell = ws.getCell(col + r);
+        cell.value = '';
+        cell.note = undefined;
+      });
+    }
+    if (lastUsed > keepUntil) {
+      try { ws.spliceRows(keepUntil + 1, lastUsed - keepUntil); } catch(e) {}
+    }
+  }
+
   function guinchoOSExportar(os) {
     const g = os?.deslocamentoGuincho || os?.guincho || {};
     const kmTotal = n(g.kmTotal || 0);
@@ -624,6 +654,7 @@
 
     // Não insere linhas e não altera o cabeçalho. Usa somente o espaço final que o modelo já possui.
     try {
+      limparBlocoAssinaturaAgrupada(ws, labelRow, representanteRow);
       for (let r = labelRow; r <= representanteRow + 2; r++) {
         ws.getRow(r).hidden = false;
         ws.getRow(r).height = r > labelRow && r < representanteRow ? 24 : Math.max(ws.getRow(r).height || 18, 18);
@@ -1609,6 +1640,7 @@
     setCell(ws, 'A' + dataRow, dataExtenso(dt.cidade || dc.cidade));
     setCell(ws, 'A' + representanteRow, String(representante).toUpperCase());
     await inserirAssinaturaExcelJS(wb, ws, assinaturaExportar, representanteRow);
+    limparLinhasAbaixoExportar(ws, representanteRow + 3);
 
     ws.pageSetup = {
       ...ws.pageSetup,
