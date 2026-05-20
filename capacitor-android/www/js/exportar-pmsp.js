@@ -703,6 +703,75 @@
     }
   }
 
+  async function inserirAssinaturaFinalAgrupadaExcelJS(wb, ws, assinatura, startRow) {
+    const ass = normalizarAssinaturaExportar(assinatura);
+    const nome = limparTexto(ass.nomeResponsavel);
+    const cargo = limparTexto(ass.cargo) || 'Responsavel tecnico';
+    const doc = limparTexto(ass.documento);
+    const url = limparTexto(ass.url);
+    const endRow = startRow + 5;
+
+    for (let r = startRow; r <= endRow; r++) {
+      safeUnmergeOverlaps(ws, `A${r}:H${r}`);
+      ['A','B','C','D','E','F','G','H'].forEach(col => {
+        const cell = ws.getCell(col + r);
+        cell.value = '';
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } };
+        cell.border = {
+          top: { style: 'thin', color: { argb: 'FF000000' } },
+          left: { style: 'thin', color: { argb: 'FF000000' } },
+          bottom: { style: 'thin', color: { argb: 'FF000000' } },
+          right: { style: 'thin', color: { argb: 'FF000000' } }
+        };
+        cell.alignment = { ...(cell.alignment || {}), vertical: 'middle', wrapText: true, shrinkToFit: true };
+      });
+      ws.getRow(r).hidden = false;
+      ws.getRow(r).height = r <= startRow + 2 ? 30 : 18;
+    }
+
+    safeMerge(ws, `B${startRow}:E${startRow + 2}`);
+    ['F','G'].forEach(col => {
+      for (let r = startRow; r <= startRow + 2; r++) {
+        ws.getCell(col + r).font = { name: 'Arial', size: 8, bold: col === 'F', color: { argb: 'FF000000' } };
+        ws.getCell(col + r).alignment = { horizontal: col === 'F' ? 'right' : 'left', vertical: 'middle', wrapText: true, shrinkToFit: true };
+      }
+    });
+    setCell(ws, 'F' + startRow, 'Assinante');
+    setCell(ws, 'G' + startRow, nome || '');
+    setCell(ws, 'F' + (startRow + 1), 'Funcao');
+    setCell(ws, 'G' + (startRow + 1), cargo || '');
+    setCell(ws, 'F' + (startRow + 2), 'Documento');
+    setCell(ws, 'G' + (startRow + 2), doc || '');
+
+    if (!url) {
+      setCell(ws, 'B' + startRow, 'Imagem da assinatura nao cadastrada');
+      ws.getCell('B' + startRow).alignment = { horizontal: 'center', vertical: 'middle', wrapText: true, shrinkToFit: true };
+      return false;
+    }
+
+    const img = await imagemUrlParaDataURLAssinatura(url);
+    if (!img) {
+      setCell(ws, 'B' + startRow, 'Imagem da assinatura nao carregou');
+      ws.getCell('B' + startRow).alignment = { horizontal: 'center', vertical: 'middle', wrapText: true, shrinkToFit: true };
+      return false;
+    }
+
+    try {
+      const imageId = wb.addImage({ base64: img.base64, extension: img.extension });
+      ws.addImage(imageId, {
+        tl: { col: 1.25, row: startRow - 1 + 0.08 },
+        br: { col: 4.75, row: startRow + 2 + 0.78 },
+        editAs: 'oneCell'
+      });
+      return true;
+    } catch (e) {
+      console.warn('[PMSP XLSX] Falha ao embutir imagem da assinatura agrupada:', e?.message || e);
+      setCell(ws, 'B' + startRow, 'Imagem da assinatura nao foi embutida no XLSX');
+      ws.getCell('B' + startRow).alignment = { horizontal: 'center', vertical: 'middle', wrapText: true, shrinkToFit: true };
+      return false;
+    }
+  }
+
   async function inserirLogoOficinaExcelJS(wb, ws, logo) {
     const dadosLogo = normalizarLogoExportar(logo);
     const url = limparTexto(dadosLogo.url);
@@ -1596,8 +1665,8 @@
     const resumoMORow = totalGeralRow + 3;
     const resumoTotalRow = totalGeralRow + 4;
     const contratoRow = totalGeralRow + 5;
-    const dataRow = totalGeralRow + 6;
-    const representanteRow = totalGeralRow + 10;
+    const assinaturaStartRow = contratoRow + 1;
+    const assinaturaEndRow = assinaturaStartRow + 5;
 
     const cabecalho = dc.cabecalho || 'SECRETARIA DA SEGURANCA PUBLICA\nPOLICIA MILITAR DO ESTADO DE SAO PAULO';
     setCell(ws, 'B1', formatarCabecalhoPM(cabecalho));
@@ -1630,17 +1699,15 @@
     const totalPecas = linhasPecas.reduce((sum, p) => sum + p.total, 0);
     const totalMO = linhasServ.reduce((sum, item) => sum + item.total, 0);
     const contrato = +(totalPecas + totalMO).toFixed(2);
-    prepararRodape(ws, [totalGeralRow, vistoriaRow, resumoPecasRow, resumoMORow, resumoTotalRow, contratoRow, dataRow, representanteRow]);
+    prepararRodape(ws, [totalGeralRow, vistoriaRow, resumoPecasRow, resumoMORow, resumoTotalRow, contratoRow]);
     linhaResumoValor(ws, totalGeralRow, 'TOTAL GERAL', 0, { blankValue: true });
     linhaResumoValor(ws, vistoriaRow, 'VALOR DA VISTORIA TECNICA COMPLEMENTAR AO ESCOPO DE SERVICOS', 0, { blankValue: true });
     linhaResumoValor(ws, resumoPecasRow, 'VALOR TOTAL DE PECAS', totalPecas);
     linhaResumoValor(ws, resumoMORow, 'VALOR TOTAL DE MAO DE OBRA', totalMO);
     linhaResumoValor(ws, resumoTotalRow, aprovacaoInfo?.ativa ? 'TOTAL APROVADO' : 'TOTAL GERAL', contrato);
     linhaResumoValor(ws, contratoRow, aprovacaoInfo?.ativa ? 'VALOR APROVADO / CONTRATO' : 'VALOR DO CONTRATO', contrato, { contrato: true });
-    setCell(ws, 'A' + dataRow, dataExtenso(dt.cidade || dc.cidade));
-    setCell(ws, 'A' + representanteRow, String(representante).toUpperCase());
-    await inserirAssinaturaExcelJS(wb, ws, assinaturaExportar, representanteRow);
-    limparLinhasAbaixoExportar(ws, representanteRow + 3);
+    await inserirAssinaturaFinalAgrupadaExcelJS(wb, ws, assinaturaExportar, assinaturaStartRow);
+    limparLinhasAbaixoExportar(ws, assinaturaEndRow);
 
     ws.pageSetup = {
       ...ws.pageSetup,
@@ -1648,7 +1715,7 @@
       fitToPage: true,
       fitToWidth: 1,
       fitToHeight: 0,
-      printArea: `A1:H${representanteRow + 3}`
+      printArea: `A1:H${assinaturaEndRow}`
     };
 
     const fname = `${(dv.prefixo || String(os.id || '').slice(-6).toUpperCase() || 'OS')}_ITENS_AGRUPADOS.xlsx`;

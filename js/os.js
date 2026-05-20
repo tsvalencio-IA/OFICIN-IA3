@@ -4403,6 +4403,94 @@ function _ciliaDeveAbrirGrupoRender(peca) {
   return !anterior || String(anterior.dataset?.ciliaGrupo || '') !== grupoAtual;
 }
 
+function _ciliaChaveNormalizada(v) {
+  return String(v || '')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase()
+    .replace(/[^A-Z0-9]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function _ciliaChavePecaImportada(peca) {
+  const codigo = _ciliaChaveNormalizada(peca?.codigo || peca?.cod || peca?.oem || '');
+  if (codigo) return 'COD:' + codigo;
+  const desc = _ciliaChaveNormalizada(peca?.desc || peca?.descricao || '');
+  return desc ? 'DESC:' + desc : '';
+}
+
+function _ciliaChavePecaWrap(wrap) {
+  const row = wrap?.querySelector?.('[data-cilia="1"], [data-peca-avulsa="1"]');
+  const codigo = _ciliaChaveNormalizada(row?.querySelector?.('.peca-codigo')?.value || '');
+  if (codigo) return 'COD:' + codigo;
+  const desc = _ciliaChaveNormalizada(row?.querySelector?.('.peca-desc-livre')?.value || '');
+  return desc ? 'DESC:' + desc : '';
+}
+
+function _ciliaEncontrarWrapPecaExistente(peca) {
+  const chave = _ciliaChavePecaImportada(peca);
+  if (!chave) return null;
+  const container = typeof $ === 'function' ? $('containerPecasOS') : document.getElementById('containerPecasOS');
+  if (!container) return null;
+  return Array.from(container.querySelectorAll('.cilia-peca-wrap')).find(wrap => _ciliaChavePecaWrap(wrap) === chave) || null;
+}
+
+function _ciliaAtualizarWrapPecaExistente(wrap, peca, descPeca) {
+  if (!wrap) return;
+  const grupo = _ciliaGrupoSistemaPeca(peca || {});
+  peca = Object.assign({}, peca, {
+    ciliaGrupo: peca?.ciliaGrupo || grupo.nome,
+    ciliaGrupoOrdem: peca?.ciliaGrupoOrdem ?? grupo.ordem,
+    ciliaAgrupador: peca?.ciliaAgrupador || _ciliaAgrupadorPeca(peca || {}),
+    ciliaPosicaoOrdem: peca?.ciliaPosicaoOrdem ?? _ciliaPosicaoOrdemPeca(peca || {})
+  });
+  wrap.dataset.ciliaGrupo = peca.ciliaGrupo || '';
+  wrap.dataset.ciliaGrupoOrdem = String(peca.ciliaGrupoOrdem ?? '');
+  wrap.dataset.ciliaAgrupador = peca.ciliaAgrupador || '';
+  wrap.dataset.ciliaPosicaoOrdem = String(peca.ciliaPosicaoOrdem ?? '');
+  const grupoSelect = wrap.querySelector('.cilia-grupo-select');
+  const agrupadorInput = wrap.querySelector('.cilia-agrupador-input');
+  if (grupoSelect) grupoSelect.value = peca.ciliaGrupo || 'OUTROS';
+  if (agrupadorInput) agrupadorInput.value = peca.ciliaAgrupador || '';
+
+  const row = wrap.querySelector('[data-cilia="1"], [data-peca-avulsa="1"]');
+  if (!row) return;
+  const vBruto = numBR(peca.venda || peca.valor || 0);
+  const qtd = numBR(peca.qtd || 1) || 1;
+  row.dataset.cilia = '1';
+  row.dataset.ciliaBruto = String(vBruto);
+  row.dataset.ciliaLiquido = String(numBR(peca.ciliaValorLiquido || 0));
+  row.dataset.ciliaDesconto = String(numBR(peca.ciliaDesconto || 0));
+  row.dataset.ciliaGrupo = peca.ciliaGrupo || '';
+  row.dataset.ciliaGrupoOrdem = String(peca.ciliaGrupoOrdem ?? '');
+  row.dataset.ciliaAgrupador = peca.ciliaAgrupador || '';
+  row.dataset.ciliaPosicaoOrdem = String(peca.ciliaPosicaoOrdem ?? '');
+
+  const codigo = row.querySelector('.peca-codigo');
+  const desc = row.querySelector('.peca-desc-livre');
+  const qtdInput = row.querySelector('.peca-qtd');
+  const venda = row.querySelector('.peca-venda');
+  if (codigo && peca.codigo) codigo.value = peca.codigo;
+  if (desc && peca.desc) desc.value = peca.desc;
+  if (qtdInput) qtdInput.value = qtd;
+  if (venda && venda.dataset.editadoManual !== '1') venda.value = vBruto.toFixed(2).replace('.', ',');
+
+  const finalGov = +(qtd * vBruto * (1 - descPeca)).toFixed(2);
+  const badgeVal = row.querySelector('.peca-desc-val');
+  if (badgeVal) badgeVal.textContent = 'R$ ' + finalGov.toFixed(2).replace('.', ',');
+}
+
+function _ciliaWrapTemServicoTempa(wrap, itemTempa, peca) {
+  if (!wrap || !itemTempa) return false;
+  const codigo = _ciliaChaveNormalizada(itemTempa.codigo || '');
+  const desc = _ciliaChaveNormalizada(_ciliaDescricaoServicoTempa(itemTempa) || peca?.desc || '');
+  return Array.from(wrap.querySelectorAll('.cilia-serv-relac')).some(row => {
+    const codRow = _ciliaChaveNormalizada(row.dataset?.codigoTabela || '');
+    const descRow = _ciliaChaveNormalizada(row.querySelector?.('.serv-desc')?.value || '');
+    return (codigo && codRow && codigo === codRow) || (desc && descRow && desc === descRow);
+  });
+}
+
 async function _ciliaAdicionarPecas(pecas) {
   pecas = OSU().normalizeCiliaPieces ? OSU().normalizeCiliaPieces(pecas) : pecas;
   if (!pecas || !pecas.length) {
@@ -4421,8 +4509,33 @@ async function _ciliaAdicionarPecas(pecas) {
   let _ciliaPecaIndexCounter = jaImportadas;
   let servicosTempa = 0;
   let semServicoTempa = 0;
+  let atualizadas = 0;
+  let novas = 0;
 
   for (const p of pecas) {
+    const existente = _ciliaEncontrarWrapPecaExistente(p);
+    if (existente) {
+      _ciliaAtualizarWrapPecaExistente(existente, p, descPeca);
+      if (tempaOk) {
+        const itemTempa = _ciliaBuscarServicoTempa(p, veiculoAtual);
+        if (itemTempa && !_ciliaWrapTemServicoTempa(existente, itemTempa, p)) {
+          window._ciliaAddServicoRelacionado(existente.querySelector('.cilia-servs-relacionados button'), {
+            itemTempa,
+            peca: p,
+            ehGov,
+            veiculoAtual,
+            valorHoraOficina,
+            auto: true
+          });
+          servicosTempa++;
+        } else if (!itemTempa) {
+          semServicoTempa++;
+        }
+      }
+      atualizadas++;
+      continue;
+    }
+
     const wrap = document.createElement('div');
     wrap.className = 'cilia-peca-wrap';
     wrap.dataset.ciliaPieceIndex = String(_ciliaPecaIndexCounter);
@@ -4503,6 +4616,7 @@ async function _ciliaAdicionarPecas(pecas) {
     }
 
     _ciliaPecaIndexCounter++;
+    novas++;
   }
 
   if (typeof window.calcOSTotal === 'function') window.calcOSTotal();
