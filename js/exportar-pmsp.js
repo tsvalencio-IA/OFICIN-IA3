@@ -271,15 +271,34 @@
     return limparTexto(pick(veiculoAtual.tipo, veiculoAtual.categoria, veiculoAtual.porte)).toUpperCase();
   }
 
-  function codigoServicoTempa(servico, resolvido) {
+  function codigoInternoServicoTempa(servico, resolvido) {
+    return limparTexto(pick(
+      servico?.codigoInterno,
+      servico?.codInterno,
+      servico?.codigoServicoInterno,
+      resolvido?.codigoInterno,
+      resolvido?.codInterno
+    ));
+  }
+
+  function codigoTabelaServicoTempa(servico, resolvido) {
     return limparTexto(pick(
       servico?.codigoTabela,
       servico?.codigoTempa,
+      servico?.codigoSiafisico,
+      resolvido?.codigoTabela,
+      resolvido?.codigo
+    ));
+  }
+
+  function codigoServicoTempa(servico, resolvido) {
+    return limparTexto(pick(
+      codigoInternoServicoTempa(servico, resolvido),
+      codigoTabelaServicoTempa(servico, resolvido),
       servico?.codigoServico,
       servico?.codigo,
       servico?.cod,
-      resolvido?.codigoTabela,
-      resolvido?.codigo
+      resolvido?.codigoServico
     ));
   }
 
@@ -294,6 +313,16 @@
     if (s.codigo) partes.push(`COD. SERVIÇO: ${s.codigo}`);
     if (s.sistema) partes.push(`SISTEMA: ${s.sistema}`);
     if (s.tipoVeiculo) partes.push(`TIPO VEÍCULO: ${s.tipoVeiculo}`);
+    return partes.join('\n') || s.sistema || '';
+  }
+
+  function textoSistemaServico(s) {
+    const partes = [];
+    if (s.codigoInterno) partes.push(`COD. INTERNO: ${s.codigoInterno}`);
+    if (s.codigoTabela) partes.push(`COD. SIAFISICO: ${s.codigoTabela}`);
+    if (!s.codigoInterno && !s.codigoTabela && s.codigo) partes.push(`COD. SERVICO: ${s.codigo}`);
+    if (s.sistema) partes.push(`SISTEMA: ${s.sistema}`);
+    if (s.tipoVeiculo) partes.push(`TIPO VEICULO: ${s.tipoVeiculo}`);
     return partes.join('\n') || s.sistema || '';
   }
 
@@ -1259,6 +1288,16 @@
     return linhas.join('\n');
   }
 
+  function textoItemServico(s) {
+    const linhas = ['SERVICO'];
+    if (s.codigoInterno) linhas.push(`COD. INTERNO: ${s.codigoInterno}`);
+    if (s.codigoTabela) linhas.push(`COD. SIAFISICO: ${s.codigoTabela}`);
+    if (!s.codigoInterno && !s.codigoTabela && s.codigo) linhas.push(`COD.: ${s.codigo}`);
+    if (s.sistema) linhas.push(`SIST.: ${s.sistema}`);
+    if (s.tipoVeiculo) linhas.push(`TIPO: ${s.tipoVeiculo}`);
+    return linhas.join('\n');
+  }
+
   function inserirComposicaoOSAntigo(ws, startRow, linhasPecas, linhasServ) {
     const totalRows = contarLinhasComposicaoOS(linhasPecas, linhasServ);
     if (!totalRows) return 0;
@@ -1529,12 +1568,16 @@
         (tempo > 0 && valorBrutoServico > 0 ? +(valorBrutoServico / tempo).toFixed(2) : 0) ||
         valorHoraCliente;
       const sistemaServico = resolvido.secaoHoraLabel || s.secaoHoraLabel || s.sistemaTabela || s.sistema || '';
+      const codigoInterno = codigoInternoServicoTempa(s, resolvido);
+      const codigoTabela = codigoTabelaServicoTempa(s, resolvido);
       const codigo = codigoServicoTempa(s, resolvido);
       const tipoVeiculo = extrairTipoVeiculoTempa(s, veiculo);
       const totalFinal = +(valorHora * tempo * (1 - descMO)).toFixed(2);
       return {
         key: 'servico-' + index,
         codigo,
+        codigoInterno,
+        codigoTabela,
         sistema: limparTexto(sistemaServico),
         tipoVeiculo,
         desc: limparTexto(s.desc || ''),
@@ -1650,13 +1693,16 @@
     const { tenant, linhasServ, linhasPecas, aprovacaoInfo } = coletarDados(os, cli, veiculo);
     const assinaturaExportar = await obterAssinaturaExportar(os, tenant);
     const logoExportar = await obterLogoOficinaExportar(os, tenant);
+    const resumoSecoes = resumirSecoes(linhasServ);
     const dc = dadosCliente(cli, os);
     const dv = dadosVeiculo(veiculo, os);
     const dt = dadosTenant(tenant);
     const representante = dt.representante;
 
     const composicaoRows = contarLinhasComposicaoOS(linhasPecas, linhasServ);
-    const blocoRows = Math.max(1, composicaoRows);
+    const kpiFinalRows = contarLinhasKPIFinais(resumoSecoes);
+    const aprovacaoRows = contarLinhasAprovacaoExportar(aprovacaoInfo);
+    const blocoRows = Math.max(1, composicaoRows + kpiFinalRows + aprovacaoRows);
     limparCorpoTemplateAgrupado(ws, 18, blocoRows);
 
     const totalGeralRow = 18 + blocoRows;
@@ -1695,6 +1741,8 @@
     await inserirLogoOficinaExcelJS(wb, ws, logoExportar);
 
     inserirComposicaoOS(ws, 18, linhasPecas, linhasServ);
+    inserirKPIsFinaisOS(ws, 18 + composicaoRows, linhasPecas, linhasServ, resumoSecoes);
+    inserirResumoAprovacaoExportar(ws, 18 + composicaoRows + kpiFinalRows, aprovacaoInfo);
 
     const totalPecas = linhasPecas.reduce((sum, p) => sum + p.total, 0);
     const totalMO = linhasServ.reduce((sum, item) => sum + item.total, 0);

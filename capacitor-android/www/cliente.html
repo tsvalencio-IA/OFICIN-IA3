@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
 <script>(function(){try{var t=localStorage.getItem("thiaguinho_theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);else document.documentElement.setAttribute("data-theme","dark");}catch(e){document.documentElement.setAttribute("data-theme","dark");}})();</script>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Portal do Cliente — thIAguinho</title>
 <!-- ═══ PWA: instalável como app na tela inicial do celular ═══ -->
@@ -371,67 +371,8 @@ const params = new URLSearchParams(window.location.search);
 const _tenantSlug = params.get('tenant') || params.get('t') || params.get('oficina') || params.get('slug') || null;
 if (!_tenantSlug) sessionStorage.removeItem('j_firebase_config');
 let db = window.initFirebase();
-let P = { clienteId: null, tenantId: null, tenantRefs: [], usaFirebaseIndividual: false, cliente: null, oficina: null, veiculos: [], financeiro: [] };
+let P = { clienteId: null, tenantId: null, cliente: null, oficina: null, veiculos: [], financeiro: [] };
 const formatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
-
-function _uniqPortal(arr) {
-  return Array.from(new Set((arr || []).map(v => String(v || '').trim()).filter(Boolean)));
-}
-
-function _setTenantPortal(found, rawRef) {
-  const d = found?.data || {};
-  P.tenantId = found?.id || rawRef || P.tenantId;
-  P.tenantRefs = _uniqPortal([
-    P.tenantId,
-    rawRef,
-    d.slug,
-    d.publicSlug,
-    d.oficinaSlug,
-    d.tenantSlug,
-    d.tenantId
-  ]);
-  P.usaFirebaseIndividual = !!(d.firebaseConfig?.projectId && d.firebaseConfig?.apiKey);
-}
-
-function _addTenantRefPortal(ref) {
-  P.tenantRefs = _uniqPortal([...(P.tenantRefs || []), ref]);
-  if (ref) P.tenantId = ref;
-}
-
-function _tenantRefsPortal() {
-  return _uniqPortal([...(P.tenantRefs || []), P.tenantId, _tenantSlug]);
-}
-
-function _baseColecaoPortal(nome) {
-  return db.collection(nome);
-}
-
-function _colecaoTenantPortal(nome) {
-  const col = _baseColecaoPortal(nome);
-  if (P.usaFirebaseIndividual) return col;
-  return col.where('tenantId', '==', P.tenantId);
-}
-
-async function _docsPorPinPortal(nome, pin) {
-  const out = [];
-  const seen = new Set();
-  async function addSnap(snap) {
-    snap.docs.forEach(doc => {
-      if (seen.has(doc.id)) return;
-      seen.add(doc.id);
-      out.push(doc);
-    });
-  }
-  for (const ref of _tenantRefsPortal()) {
-    try {
-      await addSnap(await db.collection(nome).where('tenantId', '==', ref).where('pin', '==', pin).get());
-    } catch(e) {}
-  }
-  if (!out.length && P.usaFirebaseIndividual) {
-    try { await addSnap(await db.collection(nome).where('pin', '==', pin).get()); } catch(e) {}
-  }
-  return out;
-}
 
 function toast(msg, type='ok') {
   const el = document.createElement('div'); el.className = `toast-j ${type}`;
@@ -473,8 +414,7 @@ async function _carregarBrandTenant(tenantId) {
     document.getElementById('portalOficinaName').textContent = d.nomeFantasia || 'Portal do Cliente';
     const logoL = (d.nomeFantasia||'J').charAt(0).toUpperCase();
     document.getElementById('portalLogoMark').textContent = logoL; document.getElementById('portalHdrMark').textContent  = logoL; document.getElementById('portalHdrName').textContent  = d.nomeFantasia || 'Oficina Parceira';
-    _setTenantPortal(found, tenantId);
-    P.oficina  = { id: found.id, ...d };
+    P.tenantId = found.id; P.oficina  = { id: found.id, ...d };
     try { sessionStorage.setItem('j_oficina', JSON.stringify(P.oficina)); } catch(e) {}
     if (d.firebaseConfig?.projectId && d.firebaseConfig?.apiKey) {
       sessionStorage.setItem('j_firebase_config', JSON.stringify(d.firebaseConfig));
@@ -520,42 +460,42 @@ async function portalLogin() {
 
   if (!_tenantSlug && !P.tenantId) { err.textContent = 'Link incompleto: use o link enviado pela oficina para evitar mistura de dados.'; err.style.display='block'; return; }
   if (!P.tenantId) { err.textContent = 'Oficina não encontrada neste link. Peça um novo acesso.'; err.style.display='block'; return; }
-  const modsPortal = P.oficina?.modulos || {};
-  if (String(P.oficina?.status || '').toLowerCase() === 'bloqueado') { err.textContent = 'Oficina bloqueada. Contate o atendimento.'; err.style.display='block'; return; }
-  if (modsPortal.portalCliente === false || modsPortal.clientePortal === false || modsPortal.portal === false) { err.textContent = 'Portal do cliente indisponível para esta oficina.'; err.style.display='block'; return; }
+  if (P.oficina && P.oficina.modulos && P.oficina.modulos.crm === false) { err.textContent = 'Portal do cliente indisponível para esta oficina.'; err.style.display='block'; return; }
   if (!rawLogin || !pin) { err.textContent = 'Preencha usuário e PIN.'; err.style.display='block'; return; }
   const btn = document.getElementById('btnLoginBtn'); btn.innerHTML = '<span class="spinner"></span> VALIDANDO...'; btn.disabled = true;
 
   try {
     let authSuccess = false;
-    const docsOS = await _docsPorPinPortal('ordens_servico', pin);
+    let qOS = db.collection('ordens_servico').where('pin', '==', pin);
+    if (P.tenantId) qOS = qOS.where('tenantId', '==', P.tenantId);
+    const snapOS = await qOS.get();
 
-    if (docsOS.length) {
-        for (let doc of docsOS) {
+    if (!snapOS.empty) {
+        for (let doc of snapOS.docs) {
             let osData = doc.data();
             let p = (osData.placa || '').toLowerCase().replace(/[^a-z0-9]/g, ''); 
             let c = (osData.cpf || '').toLowerCase().replace(/\D/g, ''); 
             let n = (osData.cliente || '').split(' ')[0].toLowerCase();
             let userLimpo = rawLogin.replace(/[^a-z0-9]/g, ''); 
             if (p === userLimpo || c === userLimpo || n === rawLogin) {
-                _addTenantRefPortal(osData.tenantId);
-                P.clienteId = osData.clienteId || 'avulso'; P.cliente = { nome: osData.cliente || 'Cliente' };
+                P.tenantId = osData.tenantId; P.clienteId = osData.clienteId || 'avulso'; P.cliente = { nome: osData.cliente || 'Cliente' };
                 authSuccess = true; break;
             }
         }
     }
 
     if (!authSuccess) {
-        const docsCli = await _docsPorPinPortal('clientes', pin);
-        if (docsCli.length) {
-            for (let doc of docsCli) {
+        let qCli = db.collection('clientes').where('pin', '==', pin);
+        if (P.tenantId) qCli = qCli.where('tenantId', '==', P.tenantId);
+        const snapCli = await qCli.get();
+        if (!snapCli.empty) {
+            for (let doc of snapCli.docs) {
                 let cliData = doc.data();
                 let log = (cliData.login || '').toLowerCase();
                 let docCpf = (cliData.doc || '').replace(/\D/g, '');
                 let userNum = rawLogin.replace(/\D/g, '');
                 if (log === rawLogin || (userNum && docCpf === userNum)) {
-                    _addTenantRefPortal(cliData.tenantId);
-                    P.clienteId = doc.id; P.cliente = { id: doc.id, ...cliData };
+                    P.tenantId = cliData.tenantId; P.clienteId = doc.id; P.cliente = { id: doc.id, ...cliData };
                     authSuccess = true; break;
                 }
             }
@@ -576,7 +516,7 @@ async function portalLogin() {
 
 function portalLogout() {
   sessionStorage.removeItem('j_firebase_config');
-  P = { clienteId: null, tenantId: null, tenantRefs: [], usaFirebaseIndividual: false, cliente: null, oficina: null, veiculos: [] };
+  P = { clienteId: null, tenantId: null, cliente: null, oficina: null, veiculos: [] };
   document.getElementById('loginView').style.display  = 'block'; document.getElementById('portalView').style.display = 'none';
   document.getElementById('pLogin').value = ''; document.getElementById('pPin').value   = '';
   document.getElementById('btnLoginBtn').innerHTML = 'ACESSAR MEU PAINEL'; document.getElementById('btnLoginBtn').disabled = false;
@@ -586,7 +526,7 @@ function _iniciarPortalListeners() {
   const loginUpper = document.getElementById('pLogin').value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
   
   if(P.clienteId && P.clienteId !== 'avulso') {
-    _colecaoTenantPortal('veiculos').where('clienteId', '==', P.clienteId).onSnapshot(snap => {
+    db.collection('veiculos').where('tenantId', '==', P.tenantId).where('clienteId', '==', P.clienteId).onSnapshot(snap => {
         P.veiculos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         const el = document.getElementById('agdVeiculoCli');
         if (el) el.innerHTML = '<option value="">Selecione o Veículo...</option>' + P.veiculos.map(v => `<option value="${v.id}">${v.placa} - ${v.modelo}</option>`).join('');
@@ -597,7 +537,7 @@ function _iniciarPortalListeners() {
       });
   }
 
-  _colecaoTenantPortal('ordens_servico').onSnapshot(snap => {
+  db.collection('ordens_servico').where('tenantId', '==', P.tenantId).onSnapshot(snap => {
       const osList = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(d => {
             const pLimpa = (d.placa || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
             return (P.clienteId !== 'avulso' && d.clienteId === P.clienteId) || (pLimpa && pLimpa === loginUpper) || (d.pin && d.pin === document.getElementById('pPin').value.trim()); 
@@ -608,10 +548,10 @@ function _iniciarPortalListeners() {
     });
 
   if(P.clienteId && P.clienteId !== 'avulso') {
-      _colecaoTenantPortal('mensagens').where('clienteId', '==', P.clienteId).onSnapshot(snap => {
+      db.collection('mensagens').where('tenantId', '==', P.tenantId).where('clienteId', '==', P.clienteId).onSnapshot(snap => {
           const msgs = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b)=>(a.ts||0)-(b.ts||0)); _renderChat(msgs);
         });
-      _colecaoTenantPortal('financeiro').onSnapshot(snap => {
+      db.collection('financeiro').where('tenantId', '==', P.tenantId).onSnapshot(snap => {
           const todos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
           const placas = new Set(_osDoCliente.map(o=>(o.placa||'').toUpperCase().replace(/[^A-Z0-9]/g,'')).filter(Boolean));
           const osIds = new Set(_osDoCliente.map(o=>o.id).filter(Boolean));
@@ -628,7 +568,7 @@ function _iniciarPortalListeners() {
           _renderFinanceiro(finList);
           if (window._osDoCliente) _renderPortalOS(window._osDoCliente);
         });
-      _colecaoTenantPortal('agendamentos').where('clienteId', '==', P.clienteId).onSnapshot(snap => {
+      db.collection('agendamentos').where('tenantId', '==', P.tenantId).where('clienteId', '==', P.clienteId).onSnapshot(snap => {
           const agdList = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b)=>(b.data||'') > (a.data||'') ? 1 : -1); _renderAgendamento(agdList);
         });
   } else {

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
 <script>(function(){try{var t=localStorage.getItem("thiaguinho_theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);else document.documentElement.setAttribute("data-theme","dark");}catch(e){document.documentElement.setAttribute("data-theme","dark");}})();</script>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>t.h.I.A.g.u.i.n.h.o. — Painel de Controle</title>
 <!-- ═══ PWA ═══ -->
@@ -21,7 +21,6 @@ if ('serviceWorker' in navigator) {
 </script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -29,7 +28,6 @@ if ('serviceWorker' in navigator) {
 <script src="js/config.js"></script>
 <script src="js/links-publicos.js"></script>
 <script src="js/tenant-modules.js"></script>
-<script src="js/brasil-cadastros.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&family=Exo+2:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -1484,8 +1482,8 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
   <div class="modal-foot">
     <button class="btn-ghost" id="btnGerarPDFOS" style="display:none;" onclick="window.gerarPDFOS()">📄 EXPORTAR LAUDO PDF</button>
     <button class="btn-ghost" id="btnExportarPMSP" style="display:none;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.4);color:#A78BFA;" onclick="window.exportarOrcamentoPMSP()">🛡 EXPORTAR ORÇAMENTO PMSP (XLSX)</button>
-    <button class="btn-ghost" id="btnExportarPMSPItens" style="display:none;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.36);color:#7DD3FC;" onclick="window.exportarOrcamentoPMSPItens()">📋 EXPORTAR ITENS AGRUPADOS (XLSX)</button>
     <button class="btn-ghost" id="btnExcluirOS" style="display:none;background:transparent;border:1px solid var(--danger);color:var(--danger);" onclick="window._excluirOSDoModal()">🗑 EXCLUIR O.S.</button>
+    <button class="btn-ghost" id="btnExportarPMSPItens" style="display:none;background:rgba(0,212,255,0.10);border:1px solid rgba(0,212,255,0.45);color:var(--cyan);" onclick="window.exportarOrcamentoPMSPItens()">EXPORTAR ITENS AGRUPADOS (XLSX)</button>
     <button class="btn-ghost" onclick="fecharModal('modalOS')">CANCELAR</button>
     <button class="btn-outline" id="btnSalvarContinuarOS" style="border-color:rgba(0,255,136,.45);color:var(--success);" onclick="window.salvarOSContinuar && window.salvarOSContinuar()">💾 SALVAR E CONTINUAR</button>
     <button class="btn-primary" id="btnSalvarOS" onclick="window.salvarOS()">REGISTRAR O.S.</button>
@@ -1567,11 +1565,6 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
           </div>
         </div>
       </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
-        <button type="button" class="btn-outline" onclick="window.thiaCopiarLinkClienteCadastro()">COPIAR LINK DO PORTAL</button>
-        <button type="button" class="btn-success" onclick="window.thiaEnviarAcessoClienteCadastro()">ENVIAR LINK AO CLIENTE</button>
-      </div>
-      <small style="display:block;margin-top:7px;color:var(--muted);font-family:var(--fm);font-size:.62rem;">Cliente comum abre cliente.html. Cliente Governo/Oficial abre clienteOficial.html quando o modulo estiver liberado.</small>
     </div>
   </div>
   <div class="modal-foot"><button class="btn-ghost" onclick="fecharModal('modalCliente')">CANCELAR</button><button class="btn-primary" onclick="window.salvarCliente()">SALVAR</button></div>
@@ -1700,7 +1693,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
     <div class="form-row cols-3">
       <div class="form-group"><label class="j-label">Forma de Pagamento</label>
         <select class="j-select" id="nfPgtoForma" onchange="window.checkPgtoNF()">
-          <option value="Dinheiro">Dinheiro</option><option value="PIX">PIX</option><option value="Boleto">Boleto (Pendente)</option><option value="Parcelado">Parcelado (Títulos)</option><option value="AgrupamentoPeriodo">Agrupamento por período</option>
+          <option value="Dinheiro">Dinheiro</option><option value="PIX">PIX</option><option value="Boleto">Boleto (Pendente)</option><option value="Parcelado">Parcelado (Títulos)</option>
         </select>
       </div>
       <div class="form-group"><label class="j-label">Vencimento</label><input type="date" class="j-input" id="nfVenc"></div>
@@ -1758,7 +1751,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 <div class="overlay" id="modalFunc">
 <div class="modal" style="max-width:500px;">
   <div class="modal-head"><div class="modal-title">COLABORADOR / EQUIPE</div><button class="modal-close" onclick="fecharModal('modalFunc')">✕</button></div>
-  <form class="modal-body" id="funcForm" onsubmit="event.preventDefault(); window.salvarFunc && window.salvarFunc();">
+  <div class="modal-body">
     <input type="hidden" id="funcId">
     <div class="form-row cols-2">
       <div class="form-group"><label class="j-label">Nome</label><input class="j-input" id="funcNome" placeholder="Nome completo"></div>
@@ -1779,12 +1772,12 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
     <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px;">
       <div style="font-family:var(--fm);font-size:0.65rem;color:var(--cyan);letter-spacing:2px;margin-bottom:12px;">CREDENCIAIS DE ACESSO (equipe.html)</div>
       <div class="form-row cols-2">
-        <div class="form-group"><label class="j-label">Usuário de Login</label><input class="j-input" id="funcUser" name="username" autocomplete="username" placeholder="jose.mecanico" style="font-family:var(--fm);"></div>
-        <div class="form-group"><label class="j-label">Senha</label><input type="password" class="j-input" id="funcPass" name="password" autocomplete="new-password" placeholder="••••••••"></div>
+        <div class="form-group"><label class="j-label">Usuário de Login</label><input class="j-input" id="funcUser" placeholder="jose.mecanico" style="font-family:var(--fm);"></div>
+        <div class="form-group"><label class="j-label">Senha</label><input type="password" class="j-input" id="funcPass" placeholder="••••••••"></div>
       </div>
     </div>
-  </form>
-  <div class="modal-foot"><button type="button" class="btn-ghost" onclick="fecharModal('modalFunc')">CANCELAR</button><button type="submit" form="funcForm" class="btn-primary">ADMITIR</button></div>
+  </div>
+  <div class="modal-foot"><button class="btn-ghost" onclick="fecharModal('modalFunc')">CANCELAR</button><button class="btn-primary" onclick="window.salvarFunc()">ADMITIR</button></div>
 </div>
 </div>
 
@@ -1919,6 +1912,7 @@ J.role = sessionStorage.getItem('j_role');
 J.nome = sessionStorage.getItem('j_nome');
 J.adminEmail = sessionStorage.getItem('j_admin_email') || '';
 J.tnome = sessionStorage.getItem('j_tnome');
+J.gemini = sessionStorage.getItem('j_gemini');
 J.nicho = sessionStorage.getItem('j_nicho') || 'carros';
 J.cloudName = sessionStorage.getItem('j_cloud_name') || 'dmuvm1o6m';
 J.cloudPreset = sessionStorage.getItem('j_cloud_preset') || 'evolution';
@@ -2068,93 +2062,6 @@ document.addEventListener('DOMContentLoaded', () => {
       } catch(e) { /* silencioso */ }
     }
   });
-
-  function aplicarModulosSuperadminCentral(ofi, docId) {
-    if (!ofi) return;
-    J.oficina = { ...(J.oficina || {}), id: docId || J.tid, ...ofi };
-    try { sessionStorage.setItem('j_oficina', JSON.stringify(J.oficina)); } catch(e) {}
-    try { renderAdminsOficina(J.oficina); } catch(e) {}
-    const mods = J.oficina.modulos || {};
-    window._modulosBloq = window._modulosBloq || {};
-
-    const toggleMenu = (key, hasAccess) => {
-      const btn = document.querySelector(`[onclick="ir('${key}',this)"]`);
-      if (btn) btn.style.display = hasAccess ? 'flex' : 'none';
-      const sectionId = sectionMap[key];
-      if (sectionId) {
-        const sec = document.getElementById(sectionId);
-        if (sec && !hasAccess) {
-          sec.classList.remove('active');
-          sec.style.display = 'none';
-        } else if (sec && hasAccess) {
-          sec.style.display = '';
-        }
-      }
-      window._modulosBloq[key] = !hasAccess;
-    };
-
-    toggleMenu('kanban', mods.os !== false);
-    toggleMenu('clientes', mods.crm !== false);
-    toggleMenu('estoque', mods.estoque !== false);
-    toggleMenu('vendas', mods.autoPecas === true);
-    toggleMenu('financeiro', mods.financeiro !== false);
-    toggleMenu('agenda', mods.agenda !== false);
-    toggleMenu('equipe', mods.rh !== false);
-    toggleMenu('chat', mods.chat !== false);
-    toggleMenu('chatequipe', mods.chat !== false);
-    toggleMenu('ia', mods.ia !== false);
-    toggleMenu('tabelatempa', mods.tabelaTempa !== false);
-    toggleMenu('auditoria', mods.auditoria !== false);
-
-    try {
-      if (typeof window.thiaApplyModuleVisibility === 'function') window.thiaApplyModuleVisibility(document);
-      document.body.dataset.modCotacao = mods.cotacao === false ? 'off' : 'on';
-      document.body.dataset.modClienteOficial = mods.clienteOficial === false ? 'off' : 'on';
-      document.body.dataset.modPdf = mods.pdf === false ? 'off' : 'on';
-      document.body.dataset.modXlsx = mods.xlsx === false ? 'off' : 'on';
-      document.body.dataset.modAssinatura = mods.assinatura === false ? 'off' : 'on';
-      document.body.dataset.modCilia = mods.cilia === false ? 'off' : 'on';
-    } catch(e) {}
-
-    try {
-      const sectionAtiva = document.querySelector('.section.active');
-      if (sectionAtiva) {
-        const keyAtiva = Object.keys(sectionMap).find(k => sectionMap[k] === sectionAtiva.id);
-        if (keyAtiva && window._modulosBloq[keyAtiva]) {
-          const dashBtn = document.querySelector('[onclick="ir(\'dashboard\',this)"]');
-          if (dashBtn) ir('dashboard', dashBtn);
-        }
-      }
-    } catch(e) {}
-  }
-
-  try {
-    const centralDb = window.initCentralFirebase ? window.initCentralFirebase() : null;
-    if (centralDb) {
-      const refs = Array.from(new Set([
-        J.tid,
-        J.oficina?.id,
-        J.oficina?.slug,
-        J.oficina?.publicSlug,
-        J.oficina?.oficinaSlug,
-        J.oficina?.tenantSlug
-      ].map(v => String(v || '').trim()).filter(Boolean)));
-
-      refs.forEach(ref => {
-        centralDb.collection('oficinas').doc(ref).onSnapshot(doc => {
-          if (doc.exists) aplicarModulosSuperadminCentral(doc.data(), doc.id);
-        }, err => console.log('[modulos central doc]', err.message));
-      });
-
-      ['slug','publicSlug','oficinaSlug','tenantSlug'].forEach(campo => {
-        refs.forEach(ref => {
-          centralDb.collection('oficinas').where(campo, '==', ref).limit(1).onSnapshot(snap => {
-            if (!snap.empty) aplicarModulosSuperadminCentral(snap.docs[0].data(), snap.docs[0].id);
-          }, err => console.log('[modulos central slug]', err.message));
-        });
-      });
-    }
-  } catch(e) { console.log('[modulos central]', e.message); }
 });
 const sectionMap = { dashboard:'s-dashboard', agenda:'s-agenda', kanban:'s-kanban', clientes:'s-clientes', estoque:'s-estoque', vendas:'s-vendas', financeiro:'s-financeiro', equipe:'s-equipe', chat:'s-chat', chatequipe:'s-chatequipe', ia:'s-ia', tabelatempa:'s-tabelatempa', auditoria:'s-auditoria', oficina:'s-oficina' };
 const titleMap = { dashboard:'DASHBOARD', agenda:'AGENDA', kanban:'PÁTIO / O.S.', clientes:'CLIENTES & VEÍCULOS', estoque:'ESTOQUE / NF', vendas:'VENDAS / AUTOPEÇAS', financeiro:'FINANCEIRO / DRE', equipe:'EQUIPE & RH', chat:'CRM CHAT', chatequipe:'CHAT EQUIPE', ia:'thIAguinho IA', tabelatempa:'TABELA TEMPÁRIA', auditoria:'AUDITORIA', oficina:'OFICINA / ADMINS' };
@@ -2815,72 +2722,7 @@ window._wppAcessoCliente = function(cid) {
     `👤 Usuário: *${c.login || c.nome.split(' ')[0].toLowerCase()}*\n` +
     `🔑 PIN: *${c.pin || '—'}*\n\n` +
     `Pelo portal você acompanha suas O.S. e conversa com a equipe.`;
-  if (typeof window.thiaOpenWhatsApp === 'function') window.thiaOpenWhatsApp(fone, msg);
-  else window.open(`https://web.whatsapp.com/send?phone=55${fone}&text=${encodeURIComponent(msg)}`, '_blank');
-};
-
-window.thiaClienteCadastroSnapshot = function() {
-  const id = $('cliId')?.value || '';
-  const salvo = id ? (J.clientes || []).find(x => x.id === id) : null;
-  const tipoCliente = $('cliTipoGov')?.checked ? 'governo' : 'b2c';
-  const nome = ($('cliNome')?.value || salvo?.nome || '').trim();
-  const login = ($('cliLogin')?.value || salvo?.login || nome.split(' ')[0]?.toLowerCase() || '').trim();
-  return Object.assign({}, salvo || {}, {
-    id,
-    nome,
-    wpp: ($('cliWpp')?.value || salvo?.wpp || '').replace(/\D/g, ''),
-    login,
-    pin: ($('cliPin')?.value || salvo?.pin || '').trim(),
-    tipoCliente
-  });
-};
-
-window.thiaLinkClienteCadastro = function() {
-  const c = window.thiaClienteCadastroSnapshot();
-  if (c.tipoCliente === 'governo' && typeof window.thiaModEnabled === 'function' && !window.thiaModEnabled('clienteOficial')) {
-    toast('Cliente Oficial bloqueado para esta oficina pelo Superadmin.', 'warn');
-    return '';
-  }
-  if (typeof window.thiaGetClientePortalUrl === 'function') {
-    return window.thiaGetClientePortalUrl({
-      tenant: J.oficina?.slug || J.oficina?.publicSlug || J.oficina?.oficinaSlug || J.tid || '',
-      cliente: c,
-      login: c.login || ''
-    });
-  }
-  return `https://tsvalencio-ia.github.io/OFICIN-IA/${c.tipoCliente === 'governo' ? 'clienteOficial.html' : 'cliente.html'}?tenant=${encodeURIComponent(J.tid || '')}&login=${encodeURIComponent(c.login || '')}`;
-};
-
-window.thiaCopiarLinkClienteCadastro = async function() {
-  const link = window.thiaLinkClienteCadastro();
-  if (!link) return;
-  try {
-    await navigator.clipboard.writeText(link);
-    toast('Link do portal copiado.', 'ok');
-  } catch (_) {
-    prompt('Copie o link do portal:', link);
-  }
-};
-
-window.thiaEnviarAcessoClienteCadastro = function() {
-  const c = window.thiaClienteCadastroSnapshot();
-  if (!c.nome) { toast('Informe o nome do cliente antes de enviar.', 'warn'); return; }
-  if (!c.login) { toast('Informe ou gere o login do cliente antes de enviar.', 'warn'); return; }
-  if (!c.pin) { toast('Informe ou gere o PIN do cliente antes de enviar.', 'warn'); return; }
-  if (!c.wpp) { toast('Informe o WhatsApp do cliente antes de enviar.', 'warn'); return; }
-  const link = window.thiaLinkClienteCadastro();
-  if (!link) return;
-  const primeiroNome = c.nome.split(' ')[0] || 'cliente';
-  const portal = c.tipoCliente === 'governo' ? 'portal Cliente Oficial' : 'portal do cliente';
-  const msg =
-    `Olá ${primeiroNome}!\n\n` +
-    `Aqui é a *${J.tnome || 'oficina'}*. Seu acesso ao ${portal} está pronto.\n\n` +
-    `Link: ${link}\n` +
-    `Usuário: *${c.login}*\n` +
-    `PIN: *${c.pin}*\n\n` +
-    `Pelo portal você acompanha suas O.S., documentos autorizados e mensagens da oficina.`;
-  if (typeof window.thiaOpenWhatsApp === 'function') window.thiaOpenWhatsApp(c.wpp, msg);
-  else window.open(`https://web.whatsapp.com/send?phone=55${String(c.wpp).replace(/\D/g,'')}&text=${encodeURIComponent(msg)}`, '_blank');
+  window.open(`https://wa.me/55${fone}?text=${encodeURIComponent(msg)}`, '_blank');
 };
 // ═══════════════════════════════════════════════════════════════════════
 // EXCLUSÃO DEFINITIVA — dupla confirmação + auditoria obrigatória
@@ -3009,10 +2851,9 @@ window.excluirFuncionarioDef = function(id) {
   });
 };
 window.excluirNFDef = function(id) {
-  const nf = J.notasFiscaisEntrada?.find(x => x.id === id);
   return window._excluirDef({
-    collection: 'notas_fiscais_entrada', id,
-    label: `NF ${nf?.numero || '#'+id.slice(-6).toUpperCase()}`,
+    collection: 'notas_entrada', id,
+    label: `NF #${id.slice(-6).toUpperCase()}`,
     modulo: 'NF_ENTRADA'
   });
 };
@@ -3719,32 +3560,140 @@ window.renderAuditoria = function() {
   $('tbAuditoria').innerHTML = J.auditoria.slice(0,100).map(a=>`<tr><td style="font-family:var(--fm);font-size:0.72rem;color:var(--muted)">${dtHrBr(a.ts)}</td><td><span class="pill pill-cyan">${a.modulo||'-'}</span></td><td style="font-family:var(--fm);color:var(--cyan)">${a.usuario||'-'}</td><td>${a.acao||'-'}</td></tr>`).join('');
 }
 
-// IA LOCAL
+// GEMINI IA
+// ═══════════════════════════════════════════════════════════════
+// IA — A implementação real está em js/ia.js (Gemini 2.0 Flash +
+// 24 meses de histórico + Google Search grounding + upload de PDF/imagem).
+// Este bloco foi removido pois sobrescrevia a função avançada.
+// ═══════════════════════════════════════════════════════════════
 let _jiaHist = [];
+
+function _buildContextoIA() {
+  const hoje = new Date();
+  const mesAtual = hoje.toISOString().slice(0,7); // YYYY-MM
+
+  // ── OS ──
+  let osCtx = '';
+  (J.os || []).forEach(o => {
+    const cli = (J.clientes||[]).find(c=>c.id===o.clienteId)||{};
+    const veic = (J.veiculos||[]).find(v=>v.id===o.veiculoId)||{};
+    const servs = (o.servicos||[]).map(s=>`${s.desc}(${s.tempo||0}h R$${s.valor||0})`).join(', ');
+    const pecas = (o.pecas||[]).map(p=>`${p.desc||p.codigo} x${p.qtd||1} R$${p.venda||0}`).join(', ');
+    const UOS = window.JOS || window.JarvisOSUtils || {};
+    const itens = UOS.buildBudgetItems?.(o, null) || [];
+    const keys = UOS.getApprovedKeys?.(o) || new Set(o.itensAprovados || []);
+    const exec = o.execucaoItens || {};
+    const aprov = itens.filter(i=>keys.has(i.key)).map(i=>`${i.labelTipo||i.tipo}: ${i.desc} [exec:${exec[i.key]?.status||'pendente'}${exec[i.key]?.obs?' obs:'+exec[i.key].obs:''}]`).join('; ') || 'sem itens aprovados';
+    const nao = itens.length ? itens.filter(i=>!keys.has(i.key)).map(i=>`${i.labelTipo||i.tipo}: ${i.desc}`).join('; ') : 'sem itens não aprovados';
+    osCtx += `OS#${(o.id||'').slice(-6)} | ${o.status||'?'} | Cli:${cli.nome||o.cliente||'?'} | Veic:${veic.placa||o.placa||'?'} ${veic.modelo||o.veiculo||''} | KM:${o.km||'?'} | Data:${o.data||''} | Total:R$${o.total||0} | ORCAMENTO:[Serv:${servs}] [Peças:${pecas}] | APROVADOS:${aprov} | NAO_APROVADOS_HISTORICO:${nao} | EntregueA:${o.entreguePara||'-'}
+`;
+  });
+
+  // ── FINANCEIRO ──
+  const finHoje = (J.financeiro||[]).filter(f=>{
+    try { return new Date(f.data||f.vencimento).toDateString()===hoje.toDateString(); } catch(e){return false;}
+  });
+  const finMes = (J.financeiro||[]).filter(f=>{
+    try { return (f.data||f.vencimento||'').startsWith(mesAtual); } catch(e){return false;}
+  });
+  const contasPagar = finHoje.filter(f=>f.tipo==='despesa'||f.tipo==='saida');
+  const receitasMes = finMes.filter(f=>f.tipo==='receita'||f.tipo==='entrada').reduce((s,f)=>s+parseFloat(f.valor||0),0);
+  const despMes = finMes.filter(f=>f.tipo==='despesa'||f.tipo==='saida').reduce((s,f)=>s+parseFloat(f.valor||0),0);
+  const saldo = receitasMes - despMes;
+
+  let finCtx = `FINANCEIRO ${mesAtual}: Receitas=R$${receitasMes.toFixed(2)} Despesas=R$${despMes.toFixed(2)} Saldo=R$${saldo.toFixed(2)}
+`;
+  finCtx += `CONTAS PAGAR HOJE(${hoje.toLocaleDateString('pt-BR')}): ${contasPagar.length ? contasPagar.map(f=>`${f.desc||f.descricao||'?'} R$${f.valor||0}`).join('; ') : 'Nenhuma'}
+`;
+
+  // ── ESTOQUE ──
+  const estCrit = (J.estoque||[]).filter(p=>parseFloat(p.qtd||0)<=parseFloat(p.min||0));
+  const estCtx = `ESTOQUE: ${(J.estoque||[]).length} itens. Críticos(abaixo min): ${estCrit.length>0 ? estCrit.map(p=>`${p.desc}(${p.qtd}un)`).join(', ') : 'Nenhum'}
+`;
+
+  // ── EQUIPE / COMISSÕES ──
+  let equCtx = '';
+  (J.equipe||[]).forEach(e => {
+    const osMec = (J.os||[]).filter(o=>o.mecId===e.id&&(o.data||'').startsWith(mesAtual));
+    const totalMec = osMec.reduce((s,o)=>s+parseFloat(o.maoObra||o.total||0),0);
+    const comissao = +(totalMec * parseFloat(e.comissao||0)).toFixed(2);
+    equCtx += `Func:${e.nome||'?'} Cargo:${e.cargo||'?'} Salário:R$${e.salario||0} Comissão%:${(parseFloat(e.comissao||0)*100).toFixed(0)}% OS no mês:${osMec.length} MO gerada:R$${totalMec.toFixed(2)} Comissão a pagar:R$${comissao}
+`;
+  });
+
+  // ── CLIENTES / VEÍCULOS ──
+  const cliCtx = `CLIENTES: ${(J.clientes||[]).length} cadastrados. VEÍCULOS: ${(J.veiculos||[]).length} cadastrados.
+`;
+
+  return [
+    `=== CONTEXTO REAL DO SISTEMA thIAguinho (${new Date().toLocaleString('pt-BR')}) ===`,
+    `OFICINA: ${J.tnome||'?'} | USUÁRIO: ${J.nome||'?'}`,
+    cliCtx,
+    `=== ORDENS DE SERVIÇO (${(J.os||[]).length} total) ===`,
+    osCtx || 'Nenhuma OS cadastrada.',
+    `=== FINANCEIRO ===`,
+    finCtx,
+    estCtx,
+    `=== EQUIPE (${(J.equipe||[]).length} funcionários) ===`,
+    equCtx || 'Sem funcionários cadastrados.',
+    `=== FIM DO CONTEXTO ===`
+  ].join('\n');
+}
+
+async function _jiaChamar(pergunta) {
+  const key = J.gemini || J.oficina?.apiKeys?.gemini || J.oficina?.geminiKey || null;
+  const ctx = _buildContextoIA();
+
+  _jiaAddMsg('user', pergunta);
+  const lidDiv = _jiaAddMsg('bot', '<span class="j-spinner"></span> Processando...');
+
+  if (!key) {
+    lidDiv.innerHTML = `<strong>thIAguinho:</strong> ⚠ Chave Gemini não configurada. Vá em Configurações → API Keys → Gemini e adicione sua chave para ativar a IA.`;
+    return;
+  }
+
+  try {
+    const msgs = _jiaHist.map(h=>({role:h.r==='user'?'user':'model',parts:[{text:h.t}]}));
+    const sysPrompt = `Você é o thIAguinho, assistente administrativo da oficina ${J.tnome||''}. 
+REGRAS ABSOLUTAS:
+1. Responda APENAS com base nos dados reais do sistema fornecidos abaixo. NUNCA invente valores, nomes, datas ou informações.
+2. Se a informação não estiver nos dados, diga "Não encontrei essa informação no sistema." Não suponha.
+3. Seja direto, objetivo e use formatação clara (listas quando necessário).
+4. Para perguntas financeiras, use APENAS os dados do campo FINANCEIRO.
+5. Para histórico de veículos, use APENAS os dados do campo ORDENS DE SERVIÇO.
+6. Para salários e comissões, use APENAS os dados do campo EQUIPE.
+
+${ctx}`;
+
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(key)}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        contents: msgs,
+        systemInstruction: { parts: [{ text: sysPrompt }] }
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.error?.message || `HTTP ${res.status}`);
+    const resp = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!resp) throw new Error('Resposta vazia da IA.');
+    _jiaHist.push({r:'bot', t:resp});
+    lidDiv.innerHTML = `<strong>thIAguinho:</strong> ${resp.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}`;
+  } catch(e) {
+    lidDiv.innerHTML = `<strong>thIAguinho:</strong> ❌ Erro: ${e.message}`;
+  }
+}
+
 function _jiaAddMsg(tipo, html) {
   const c = document.getElementById('iaMsgs'); if(!c) return {innerHTML:''};
   const d = document.createElement('div');
   d.className = `ia-msg ${tipo==='user'?'user':'bot'}`;
-  d.innerHTML = tipo==='user' ? `<strong>Voce:</strong> ${html}` : html;
+  d.innerHTML = tipo==='user' ? `<strong>Você:</strong> ${html}` : html;
   c.appendChild(d);
   c.scrollTop = c.scrollHeight;
-  _jiaHist.push({r:tipo, t:String(html).replace(/<[^>]*>/g,'')});
+  _jiaHist.push({r:tipo, t:html.replace(/<[^>]*>/g,'')});
   return d;
 }
-async function _jiaChamar(pergunta) {
-  _jiaAddMsg('user', pergunta);
-  const lidDiv = _jiaAddMsg('bot', '<strong>thIAguinho:</strong> <span class="j-spinner"></span> Consultando dados internos...');
-  try {
-    if (typeof window.thiaCarregarCerebroGlobal === 'function') await window.thiaCarregarCerebroGlobal();
-    const resp = typeof window.thiaResponderLocal === 'function'
-      ? window.thiaResponderLocal(pergunta, { perfil:'jarvis' })
-      : 'Motor interno indisponivel nesta tela.';
-    _jiaHist.push({r:'bot', t:String(resp).replace(/<br\s*\/?>/gi,'\n').replace(/<[^>]+>/g,'')});
-    lidDiv.innerHTML = `<strong>thIAguinho:</strong> ${resp}`;
-  } catch(e) {
-    lidDiv.innerHTML = `<strong>thIAguinho:</strong> Nao consegui cruzar os dados internos: ${e.message || e}`;
-  }
-}
+
 window.iaPerguntar = function() {
   const inp = document.getElementById('iaInput');
   const msg = inp?.value?.trim();
@@ -3752,13 +3701,20 @@ window.iaPerguntar = function() {
   inp.value = '';
   _jiaChamar(msg);
 };
+
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('iaInput')?.addEventListener('keydown', e => {
     if (e.key === 'Enter') window.iaPerguntar();
   });
 });
-window.iaAnalisarDRE = function() { _jiaChamar('Analise o financeiro atual e aponte vencidos, riscos e prioridades.'); };
-window.iaAnalisarEstoque = function() { _jiaChamar('Quais pecas estao em estoque critico e precisam de reposicao?'); };
+
+window.iaAnalisarDRE = function() {
+  _jiaChamar('Analise o DRE do mês atual: receitas, despesas, saldo, e me diga se está saudável ou se há alertas.');
+};
+
+window.iaAnalisarEstoque = function() {
+  _jiaChamar('Analise o estoque atual: quais itens estão abaixo do mínimo, quais precisam ser comprados urgente, e o total em estoque.');
+};
 </script>
 <script src="js/fiscal.js"></script>
 <script src="js/financeiro.js"></script>
@@ -3766,7 +3722,6 @@ window.iaAnalisarEstoque = function() { _jiaChamar('Quais pecas estao em estoque
 <script src="js/os-utils.js"></script>
 <script src="js/os.js"></script>
 <script src="js/cotacoes.js"></script>
-<script src="js/valoria-integracao.js"></script>
 <script src="js/assinatura-os.js"></script>
 <script src="js/ia.js"></script>
 <script src="js/tabela-tempa.js"></script>
@@ -3777,9 +3732,5 @@ window.iaAnalisarEstoque = function() { _jiaChamar('Quais pecas estao em estoque
 <script src="js/theme.js"></script>
 <script src="js/hardening-comercial.js"></script>
 <script src="js/uix-theme-fix.js"></script>
-<script src="js/hardening-operacional-20260515.js"></script>
-<script src="js/operacional-cadastros-nf-fix-20260518.js"></script>
 </body>
 </html>
-
-

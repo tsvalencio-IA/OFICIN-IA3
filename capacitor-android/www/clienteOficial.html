@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
 <script>(function(){try{var t=localStorage.getItem("thiaguinho_theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);else document.documentElement.setAttribute("data-theme","dark");}catch(e){document.documentElement.setAttribute("data-theme","dark");}})();</script>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Portal Oficial — thIAguinho</title>
+<title>Portal Oficial â€” thIAguinho</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#A78BFA">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -45,7 +45,7 @@ body{background:var(--bg0);color:var(--text);font-family:var(--ff);min-height:10
 ::-webkit-scrollbar-track{background:var(--bg1)}
 ::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:4px}
 
-/* ── LOGIN ── */
+/* â”€â”€ LOGIN â”€â”€ */
 .login-overlay{position:fixed;inset:0;background:var(--bg0);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px}
 .login-box{background:var(--bg1);border:1px solid var(--border-s);border-radius:var(--rx);padding:36px 28px;width:100%;max-width:400px;position:relative}
 .login-box::before{content:'';position:absolute;top:0;left:10%;right:10%;height:3px;background:linear-gradient(90deg,transparent,var(--gov),transparent)}
@@ -58,7 +58,7 @@ body{background:var(--bg0);color:var(--text);font-family:var(--ff);min-height:10
 .btn-login:hover{opacity:.9}
 .err-box{background:var(--err-dim);border:1px solid var(--err);color:var(--err);padding:11px;border-radius:var(--r);font-size:0.78rem;margin-bottom:14px;display:none}
 
-/* ── HEADER ── */
+/* â”€â”€ HEADER â”€â”€ */
 .gov-header{background:linear-gradient(135deg,var(--bg1),var(--bg2));border:1px solid var(--border-s);border-radius:var(--rx);padding:18px 22px;margin-bottom:14px;display:flex;align-items:center;gap:14px}
 .gov-shield{width:50px;height:50px;background:var(--gov);border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0}
 .gov-info{flex:1;min-width:0}
@@ -67,7 +67,7 @@ body{background:var(--bg0);color:var(--text);font-family:var(--ff);min-height:10
 .btn-sair{background:transparent;border:1px solid var(--border);color:var(--muted);padding:8px 14px;border-radius:var(--r);font-family:var(--mono);font-size:0.68rem;letter-spacing:1px;cursor:pointer;transition:.2s;white-space:nowrap}
 .btn-sair:hover{background:var(--err-dim);border-color:var(--err);color:var(--err)}
 
-/* ── STATS ── */
+/* â”€â”€ STATS â”€â”€ */
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:14px}
 .stat{background:var(--bg1);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px}
 .stat-lbl{font-family:var(--mono);font-size:0.63rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
@@ -79,7 +79,7 @@ body{background:var(--bg0);color:var(--text);font-family:var(--ff);min-height:10
 .secao-kpi-val{font-family:var(--mono);font-size:1rem;color:var(--gov);font-weight:800;margin-top:6px}
 .secao-kpi-meta{font-family:var(--mono);font-size:.62rem;color:var(--muted);margin-top:3px}
 
-/* ── NAV TABS ── */
+/* â”€â”€ NAV TABS â”€â”€ */
 .nav-wrap{background:rgba(12,20,38,.95);backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:var(--rx);margin-bottom:14px;overflow:hidden;position:sticky;top:8px;z-index:100}
 .nav-tabs{display:flex;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid rgba(255,255,255,.05)}
 .nav-tabs::-webkit-scrollbar{display:none}
@@ -91,7 +91,7 @@ body{background:var(--bg0);color:var(--text);font-family:var(--ff);min-height:10
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* ── OS CARD ── */
+/* â”€â”€ OS CARD â”€â”€ */
 .os-card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--rx);overflow:hidden;margin-bottom:18px;box-shadow:0 6px 24px rgba(0,0,0,.35);transition:.3s}
 .os-header{padding:18px 20px;background:linear-gradient(135deg,var(--bg2),var(--bg1));border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start}
 .placa-box{display:inline-block;background:#fff;border:1px solid #ccc;border-radius:4px;overflow:hidden;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.4)}
@@ -114,7 +114,7 @@ body{background:var(--bg0);color:var(--text);font-family:var(--ff);min-height:10
 .step.active .step-lbl{color:var(--gov);font-weight:700}
 .step.done .step-lbl{color:var(--ok)}
 
-/* Orçamento alerta */
+/* OrÃ§amento alerta */
 .alerta-orc{margin:18px 20px;padding:18px;background:linear-gradient(135deg,var(--warn-dim),transparent);border-left:4px solid var(--warn);border-radius:0 var(--r) var(--r) 0}
 .btn-aprovar{background:var(--ok);border:none;border-radius:var(--r);padding:12px 20px;color:#000;font-family:var(--disp);font-weight:700;font-size:.95rem;letter-spacing:1px;cursor:pointer;flex:1;transition:.2s}
 .btn-negociar{background:transparent;border:1px solid var(--gov);border-radius:var(--r);padding:12px 20px;color:var(--gov);font-family:var(--disp);font-weight:700;font-size:.95rem;letter-spacing:1px;cursor:pointer;flex:1;transition:.2s}
@@ -168,7 +168,7 @@ body{background:var(--bg0);color:var(--text);font-family:var(--ff);min-height:10
 .p-gov{background:var(--gov-dim);color:var(--gov);border:1px solid var(--border-s)}
 .p-ent{background:rgba(139,149,184,.12);color:var(--muted);border:1px solid var(--disabled)}
 
-/* Histórico table */
+/* HistÃ³rico table */
 .t{width:100%;border-collapse:collapse;font-size:.8rem}
 .t th,.t td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--border)}
 .t th{background:var(--bg2);color:var(--muted);font-family:var(--mono);font-size:.65rem;letter-spacing:1px;text-transform:uppercase;font-weight:600}
@@ -201,13 +201,13 @@ body{background:var(--bg0);color:var(--text);font-family:var(--ff);min-height:10
 <!-- LOGIN -->
 <div class="login-overlay" id="loginOverlay">
   <div class="login-box">
-    <h1>🛡 Portal Oficial</h1>
-    <div class="sub">Órgão Público · Acesso Restrito</div>
+    <h1>ðŸ›¡ Portal Oficial</h1>
+    <div class="sub">Ã“rgÃ£o PÃºblico Â· Acesso Restrito</div>
     <div class="err-box" id="loginErr"></div>
-    <label>Login do Órgão</label>
+    <label>Login do Ã“rgÃ£o</label>
     <input type="email" id="loginInput" name="username" inputmode="email" placeholder="Ex: pmsp.30bpm" autocomplete="username email" autocapitalize="none" autocorrect="off" spellcheck="false">
     <label>PIN de Acesso</label>
-    <input type="password" id="pinInput" name="current-password" placeholder="••••••" autocomplete="current-password">
+    <input type="password" id="pinInput" name="current-password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢" autocomplete="current-password">
     <button class="btn-login" id="btnLogin" onclick="doLogin()">ACESSAR PORTAL</button>
   </div>
 </div>
@@ -217,28 +217,29 @@ body{background:var(--bg0);color:var(--text);font-family:var(--ff);min-height:10
   <div style="max-width:1100px;margin:0 auto;padding:14px 14px 40px">
 
     <div class="gov-header">
-      <div class="gov-shield">🛡</div>
+      <div class="gov-shield">ðŸ›¡</div>
       <div class="gov-info">
         <div class="gov-titulo" id="hdrUnidade">Carregando...</div>
-        <div class="gov-sub" id="hdrSub">—</div>
+        <div class="gov-sub" id="hdrSub">â€”</div>
       </div>
-      <button class="btn-sair" onclick="sair()">⏻ SAIR</button>
+      <button class="btn-sair" onclick="sair()">â» SAIR</button>
     </div>
 
     <div class="stats-grid">
-      <div class="stat"><div class="stat-lbl">Viaturas</div><div class="stat-val" id="stVeic">—</div><div class="stat-meta">no contrato</div></div>
-      <div class="stat"><div class="stat-lbl">OS Ativas</div><div class="stat-val" id="stOrc">—</div><div class="stat-meta">em andamento</div></div>
-      <div class="stat"><div class="stat-lbl">Valor no Período</div><div class="stat-val" id="stValor">R$ 0</div><div class="stat-meta">filtrado</div></div>
-      <div class="stat"><div class="stat-lbl">Prontos p/ Retirada</div><div class="stat-val" id="stPrt">—</div><div class="stat-meta">aguardando</div></div>
+      <div class="stat"><div class="stat-lbl">Viaturas</div><div class="stat-val" id="stVeic">â€”</div><div class="stat-meta">no contrato</div></div>
+      <div class="stat"><div class="stat-lbl">OS Ativas</div><div class="stat-val" id="stOrc">â€”</div><div class="stat-meta">em andamento</div></div>
+      <div class="stat"><div class="stat-lbl">Valor no PerÃ­odo</div><div class="stat-val" id="stValor">R$ 0</div><div class="stat-meta">filtrado</div></div>
+      <div class="stat"><div class="stat-lbl">Prontos p/ Retirada</div><div class="stat-val" id="stPrt">â€”</div><div class="stat-meta">aguardando</div></div>
     </div>
     <div class="secao-kpis" id="secaoKpis"></div>
 
     <div class="nav-wrap">
       <div class="nav-tabs">
-        <button class="tab-btn active" onclick="trocarTab('tOS',this)">🚓 OS / Viaturas</button>
-        <button class="tab-btn" onclick="trocarTab('tChat',this)">💬 Chat <span class="tab-badge" id="chatBadge">0</span></button>
-        <button class="tab-btn" onclick="trocarTab('tAgd',this)">📅 Agendar</button>
-        <button class="tab-btn" onclick="trocarTab('tHist',this)">📜 Histórico</button>
+        <button class="tab-btn active" onclick="trocarTab('tOS',this)">ðŸš“ OS / Viaturas</button>
+        <button class="tab-btn" onclick="trocarTab('tChat',this)">ðŸ’¬ Chat <span class="tab-badge" id="chatBadge">0</span></button>
+        <button class="tab-btn" onclick="trocarTab('tAgd',this)">ðŸ“… Agendar</button>
+        <button class="tab-btn" onclick="trocarTab('tHist',this)">ðŸ“œ HistÃ³rico</button>
+        <button class="tab-btn" data-module="clienteOficial,tabelaTempa" data-submodule="cliente.tabelaTempaOficial" id="tabTempaOficialBtn" onclick="trocarTab('tTempaOficial',this);renderTempaOficial()">Tabela Temparia</button>
       </div>
     </div>
 
@@ -247,11 +248,32 @@ body{background:var(--bg0);color:var(--text);font-family:var(--ff);min-height:10
       <div id="renderOS"><div class="empty">Carregando...</div></div>
       <!-- Sub-tabs viaturas -->
       <div style="margin-top:22px;background:var(--bg1);border:1px solid var(--border);border-radius:var(--rx);overflow:hidden">
-        <div style="padding:14px 18px;border-bottom:1px solid var(--border);font-family:var(--disp);font-weight:700;font-size:1rem;color:var(--gov)">🚓 Frota Cadastrada</div>
+        <div style="padding:14px 18px;border-bottom:1px solid var(--border);font-family:var(--disp);font-weight:700;font-size:1rem;color:var(--gov)">ðŸš“ Frota Cadastrada</div>
         <div style="overflow-x:auto">
           <table class="t">
-            <thead><tr><th>Prefixo</th><th>Marca / Modelo</th><th>Placa</th><th>Patrimônio</th><th>KM</th></tr></thead>
+            <thead><tr><th>Prefixo</th><th>Marca / Modelo</th><th>Placa</th><th>PatrimÃ´nio</th><th>KM</th></tr></thead>
             <tbody id="tbViat"><tr><td colspan="5" class="empty">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: TABELA TEMPÁRIA -->
+    <div class="tab-content" id="tTempaOficial" data-module="clienteOficial,tabelaTempa" data-submodule="cliente.tabelaTempaOficial">
+      <div style="background:var(--bg1);border:1px solid var(--border);border-radius:var(--rx);overflow:hidden;margin-bottom:14px">
+        <div style="padding:14px 18px;border-bottom:1px solid var(--border);font-family:var(--disp);font-weight:700;font-size:1rem;color:var(--gov)">Tabela Tempária - Consulta do Fiscal</div>
+        <div style="padding:14px 18px;display:grid;grid-template-columns:minmax(220px,1fr) 150px;gap:10px;align-items:end">
+          <div>
+            <label style="display:block;font-family:var(--mono);font-size:.62rem;color:var(--muted);margin-bottom:4px">SERVIÇO, SISTEMA OU CÓDIGO</label>
+            <input class="j-input" id="tempaOficialBusca" placeholder="Ex.: ALM001, freio, suspensão..." oninput="renderTempaOficial()">
+          </div>
+          <button class="btn-gov" onclick="renderTempaOficial()">PESQUISAR</button>
+        </div>
+        <div id="tempaOficialStatus" style="padding:0 18px 10px;color:var(--muted);font-family:var(--mono);font-size:.66rem"></div>
+        <div style="overflow-x:auto">
+          <table class="t">
+            <thead><tr><th>Código Interno</th><th>SIAFÍSICO</th><th>Sistema</th><th>Operação / Serviço</th><th style="text-align:right">Tempo</th></tr></thead>
+            <tbody id="tempaOficialBody"><tr><td colspan="5" class="empty">Digite para pesquisar.</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -270,11 +292,11 @@ body{background:var(--bg0);color:var(--text);font-family:var(--ff);min-height:10
           <div style="text-align:center;color:var(--muted);font-size:.85rem;padding:24px">Envie uma mensagem ou foto para a oficina.</div>
         </div>
         <div class="chat-input-area">
-          <button id="btnPtt" title="Gravar Áudio" onclick="_togglePtt()" style="background:var(--bg3);border:1px solid var(--border);color:#fff;font-size:1.1rem;cursor:pointer;width:42px;height:42px;min-width:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:.2s">🎤</button>
-          <button title="Anexar" onclick="document.getElementById('fileInput').click()" style="background:var(--bg3);border:1px solid var(--border);color:var(--gov);font-size:1.1rem;cursor:pointer;width:42px;height:42px;min-width:42px;border-radius:50%;display:flex;align-items:center;justify-content:center">📎</button>
+          <button id="btnPtt" title="Gravar Ãudio" onclick="_togglePtt()" style="background:var(--bg3);border:1px solid var(--border);color:#fff;font-size:1.1rem;cursor:pointer;width:42px;height:42px;min-width:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:.2s">ðŸŽ¤</button>
+          <button title="Anexar" onclick="document.getElementById('fileInput').click()" style="background:var(--bg3);border:1px solid var(--border);color:var(--gov);font-size:1.1rem;cursor:pointer;width:42px;height:42px;min-width:42px;border-radius:50%;display:flex;align-items:center;justify-content:center">ðŸ“Ž</button>
           <input type="file" id="fileInput" style="display:none" accept="image/*,video/*,audio/*,application/pdf" onchange="_enviarArquivo(this)">
           <input id="chatInput" placeholder="Mensagem..." autocomplete="off" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:22px;padding:11px 18px;color:var(--text);font-family:var(--ff);font-size:.88rem;outline:none">
-          <button onclick="_enviarMsg()" style="background:var(--gov);border:none;border-radius:50%;width:42px;height:42px;min-width:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;color:#0F1421">➤</button>
+          <button onclick="_enviarMsg()" style="background:var(--gov);border:none;border-radius:50%;width:42px;height:42px;min-width:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;color:#0F1421">âž¤</button>
         </div>
       </div>
     </div>
@@ -282,20 +304,20 @@ body{background:var(--bg0);color:var(--text);font-family:var(--ff);min-height:10
     <!-- TAB: AGENDAR -->
     <div class="tab-content" id="tAgd">
       <div class="form-card">
-        <div style="font-family:var(--disp);font-size:1.25rem;font-weight:700;color:#fff;margin-bottom:18px">📅 Solicitar Revisão / Serviço</div>
+        <div style="font-family:var(--disp);font-size:1.25rem;font-weight:700;color:#fff;margin-bottom:18px">ðŸ“… Solicitar RevisÃ£o / ServiÃ§o</div>
         <label class="j-label">Viatura</label>
         <select class="j-input" id="agdVeiculo"><option value="">Carregando viaturas...</option></select>
-        <label class="j-label">Data de Preferência</label>
+        <label class="j-label">Data de PreferÃªncia</label>
         <input type="date" class="j-input" id="agdData">
         <label class="j-label">O que precisa ser feito?</label>
-        <input type="text" class="j-input" id="agdServico" placeholder="Ex: Troca de óleo, revisão preventiva...">
-        <button class="btn-gov" onclick="_salvarAgendamento()">ENVIAR SOLICITAÇÃO</button>
+        <input type="text" class="j-input" id="agdServico" placeholder="Ex: Troca de Ã³leo, revisÃ£o preventiva...">
+        <button class="btn-gov" onclick="_salvarAgendamento()">ENVIAR SOLICITAÃ‡ÃƒO</button>
       </div>
       <div id="renderAgd"></div>
-    </div>    <!-- TAB: HISTÓRICO -->
+    </div>    <!-- TAB: HISTÃ“RICO -->
     <div class="tab-content" id="tHist">
       <div style="background:var(--bg1);border:1px solid var(--border);border-radius:var(--rx);overflow:hidden;margin-bottom:14px">
-        <div style="padding:14px 18px;border-bottom:1px solid var(--border);font-family:var(--disp);font-weight:700;font-size:1rem;color:var(--gov)">📜 OS Concluídas</div>
+        <div style="padding:14px 18px;border-bottom:1px solid var(--border);font-family:var(--disp);font-weight:700;font-size:1rem;color:var(--gov)">ðŸ“œ OS ConcluÃ­das</div>
         <div style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;padding:12px 18px;border-bottom:1px solid var(--border);background:rgba(255,255,255,.02)">
           <div style="min-width:150px;flex:1">
             <label style="display:block;font-family:var(--mono);font-size:.62rem;color:var(--muted);margin-bottom:4px">DATA INICIAL</label>
@@ -314,19 +336,19 @@ body{background:var(--bg0);color:var(--text);font-family:var(--ff);min-height:10
           </table>
         </div>
       </div>
-      <!-- Detalhe OS histórico (abre abaixo da tabela) -->
+      <!-- Detalhe OS histÃ³rico (abre abaixo da tabela) -->
       <div id="histDetalhe" style="display:none"></div>
     </div>
 
-    <!-- Modal overlay para OS do histórico em tela cheia -->
+    <!-- Modal overlay para OS do histÃ³rico em tela cheia -->
     <div id="modalHistOS" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9000;overflow-y:auto;padding:14px">
       <div style="max-width:860px;margin:0 auto;position:relative">
-        <button onclick="fecharModalHist()" style="position:sticky;top:8px;float:right;z-index:10;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:10px 18px;border-radius:var(--r);font-family:var(--mono);font-size:.75rem;cursor:pointer;margin-bottom:10px">✕ FECHAR</button>
+        <button onclick="fecharModalHist()" style="position:sticky;top:8px;float:right;z-index:10;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:10px 18px;border-radius:var(--r);font-family:var(--mono);font-size:.75rem;cursor:pointer;margin-bottom:10px">âœ• FECHAR</button>
         <div style="clear:both" id="modalHistConteudo"></div>
       </div>
     </div>
 
-    <div class="footer">Powered by thIAguinho Soluções Digitais</div>
+    <div class="footer">Powered by thIAguinho SoluÃ§Ãµes Digitais</div>
   </div>
 </div>
 
@@ -336,6 +358,7 @@ body{background:var(--bg0);color:var(--text);font-family:var(--ff);min-height:10
 <script src="js/links-publicos.js"></script>
 <script src="js/tenant-modules.js"></script>
 <script src="js/os-utils.js"></script>
+<script src="js/tabela-tempa.js"></script>
 <script>
 'use strict';
 const portalParams = new URLSearchParams(window.location.search);
@@ -343,26 +366,12 @@ const _tenantSlug = portalParams.get('tenant') || portalParams.get('t') || porta
 if (!_tenantSlug) sessionStorage.removeItem('j_firebase_config');
 let db = window.initFirebase();
 let CLI = null, TID = null;
-let TREFS = [], USA_FIREBASE_INDIVIDUAL = false;
 let _OS = [], _VEIC = [], _FIN = [], _OFIC = null;
 const fmt = new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
 const _tenantReady = _tenantSlug ? _prepararTenantPortal(_tenantSlug) : Promise.resolve();
 
-function _uniqOficial(arr){ return Array.from(new Set((arr||[]).map(v=>String(v||'').trim()).filter(Boolean))); }
-function _setTenantOficial(found, rawRef){
-  const d = found?.data || {};
-  TID = found?.id || rawRef || TID;
-  TREFS = _uniqOficial([TID, rawRef, d.slug, d.publicSlug, d.oficinaSlug, d.tenantSlug, d.tenantId]);
-  USA_FIREBASE_INDIVIDUAL = !!(d.firebaseConfig?.projectId && d.firebaseConfig?.apiKey);
-}
-function _addTenantOficial(ref){ TREFS = _uniqOficial([...TREFS, ref]); if(ref) TID = ref; }
-function _colecaoTenantOficial(nome){
-  const col = db.collection(nome);
-  return USA_FIREBASE_INDIVIDUAL ? col : col.where('tenantId','==',TID);
-}
-
 function moeda(v){ return fmt.format(parseFloat(v||0)); }
-function fmtDt(d){ if(!d) return '—'; const s=String(d); if(/^\d{4}-\d{2}-\d{2}$/.test(s.slice(0,10))){const [a,m,dd]=s.slice(0,10).split('-'); return `${dd}/${m}/${a}`;} try{ return new Date(d).toLocaleDateString('pt-BR'); }catch{ return '—'; } }
+function fmtDt(d){ if(!d) return 'â€”'; const s=String(d); if(/^\d{4}-\d{2}-\d{2}$/.test(s.slice(0,10))){const [a,m,dd]=s.slice(0,10).split('-'); return `${dd}/${m}/${a}`;} try{ return new Date(d).toLocaleDateString('pt-BR'); }catch{ return 'â€”'; } }
 function esc(s){ return String(s==null?'':s).replace(/[<>&"']/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c])); }
 function _pick(...values){
   for(const value of values){
@@ -450,11 +459,11 @@ function _tipoVeiculoServicoKPI(serv, os){
   const direto=String(serv?.tipoVeiculoTabela||serv?.tipoVeiculoTempa||serv?.tipoVeiculo||'').trim();
   if(direto) return direto;
   const base=String(serv?.sistemaTabela||serv?.sistema||serv?.secaoHoraLabel||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase();
-  if(/CAMINHAO|CAMINHOES/.test(base)) return 'CAMINHÃO';
+  if(/CAMINHAO|CAMINHOES/.test(base)) return 'CAMINHÃƒO';
   if(/SUV/.test(base)) return 'SUV';
-  if(/COMPACTO/.test(base)) return 'VEÍCULO COMPACTO';
-  if(/PEQUENOS? E MEDIOS?|MEDIO/.test(base)) return 'VEÍCULOS PEQUENOS E MÉDIOS';
-  if(/UTILITARIO|VAN/.test(base)) return 'UTILITÁRIO / VAN';
+  if(/COMPACTO/.test(base)) return 'VEÃCULO COMPACTO';
+  if(/PEQUENOS? E MEDIOS?|MEDIO/.test(base)) return 'VEÃCULOS PEQUENOS E MÃ‰DIOS';
+  if(/UTILITARIO|VAN/.test(base)) return 'UTILITÃRIO / VAN';
   if(/MOTOCICLETA|MOTO/.test(base)) return 'MOTO';
   if(/DIESEL/.test(base)) return 'DIESEL';
   if(/CICLO OTTO|OTTO/.test(base)) return 'CICLO OTTO';
@@ -485,7 +494,7 @@ function _resumoSecoesOS(os){
     out[secao].horas+=tempo;
     out[secao].total+=+(valorBruto*(1-descMO)).toFixed(2);
     out[secao].qtd+=1;
-    const codigo=String(s.codigoTabela||s.codigo||'').trim();
+    const codigo=String(s.codigoInterno||s.codigoTabela||s.codigo||'').trim();
     const sistema=String(s.sistemaTabela||s.sistema||s.secaoHoraLabel||'').trim();
     const tipo=_tipoVeiculoServicoKPI(s,os);
     if(codigo) out[secao].codigos.add(codigo);
@@ -506,8 +515,8 @@ function _kpisSecaoOSHtml(os){
     <div class="secao-kpi-lbl">${esc(secao)}</div>
     <div class="secao-kpi-val">${moeda(item.total)}</div>
     <div class="secao-kpi-meta">${item.horas.toFixed(2).replace('.',',')}h por ${item.qtd} servico(s)</div>
-    ${codigos?`<div class="secao-kpi-meta" style="color:var(--gov)">Cód.: ${esc(codigos)}</div>`:''}
-    ${tipos?`<div class="secao-kpi-meta">Tipo veículo: ${esc(tipos)}</div>`:''}
+    ${codigos?`<div class="secao-kpi-meta" style="color:var(--gov)">CÃ³d.: ${esc(codigos)}</div>`:''}
+    ${tipos?`<div class="secao-kpi-meta">Tipo veÃ­culo: ${esc(tipos)}</div>`:''}
     ${sistemas?`<div class="secao-kpi-meta">Sistema: ${esc(sistemas)}</div>`:''}
   </div>`;
   }).join('')}</div>`;
@@ -520,7 +529,7 @@ function _renderKpisSecao(){
   el.innerHTML=rows.slice(0,8).map(([secao,item])=>`<div class="secao-kpi">
     <div class="secao-kpi-lbl">${esc(secao)}</div>
     <div class="secao-kpi-val">${moeda(item.total)}</div>
-    <div class="secao-kpi-meta">${item.horas.toFixed(2).replace('.',',')}h · ${item.qtd} item(ns)</div>
+    <div class="secao-kpi-meta">${item.horas.toFixed(2).replace('.',',')}h Â· ${item.qtd} item(ns)</div>
   </div>`).join('');
 }
 function _limparFiltroHist(){
@@ -534,12 +543,12 @@ function _limparFiltroHist(){
 
 function toast(msg,type='ok'){
   const el=document.createElement('div'); el.className=`toast-j ${type}`;
-  el.innerHTML=`<strong>${type==='ok'?'✓':type==='err'?'✕':'⚠'}</strong> ${msg}`;
+  el.innerHTML=`<strong>${type==='ok'?'âœ“':type==='err'?'âœ•':'âš '}</strong> ${msg}`;
   document.getElementById('toastBox').appendChild(el);
   setTimeout(()=>{el.style.opacity='0';setTimeout(()=>el.remove(),400);},3500);
 }
 
-// ── LOGIN ──────────────────────────────────────────────────────
+// â”€â”€ LOGIN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 document.getElementById('pinInput').addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });
 document.getElementById('loginInput').addEventListener('keydown',e=>{ if(e.key==='Enter') document.getElementById('pinInput').focus(); });
 
@@ -571,40 +580,29 @@ async function doLogin(){
   err.style.display='none';
   const login=(document.getElementById('loginInput').value||'').trim();
   const pin=(document.getElementById('pinInput').value||'').trim();
-  if(!_tenantSlug&&!TID){ err.textContent='⚠ Link incompleto: use o link oficial enviado pela oficina.'; err.style.display='block'; return; }
-  if(!TID){ err.textContent='⚠ Oficina não encontrada neste link.'; err.style.display='block'; return; }
-  if(_OFIC && _OFIC.modulos && _OFIC.modulos.clienteOficial === false){ err.textContent='⚠ Portal de cliente oficial indisponível para esta oficina.'; err.style.display='block'; return; }
-  if(!login||!pin){ err.textContent='⚠ Preencha login e PIN.'; err.style.display='block'; return; }
+  if(!_tenantSlug&&!TID){ err.textContent='âš  Link incompleto: use o link oficial enviado pela oficina.'; err.style.display='block'; return; }
+  if(!TID){ err.textContent='âš  Oficina nÃ£o encontrada neste link.'; err.style.display='block'; return; }
+  if(_OFIC && _OFIC.modulos && _OFIC.modulos.clienteOficial === false){ err.textContent='âš  Portal de cliente oficial indisponÃ­vel para esta oficina.'; err.style.display='block'; return; }
+  if(!login||!pin){ err.textContent='âš  Preencha login e PIN.'; err.style.display='block'; return; }
   const btn=document.getElementById('btnLogin');
   btn.innerHTML='<span class="spinner"></span> VALIDANDO...'; btn.disabled=true;
   try{
-    const docs=[];
-    const seen=new Set();
-    for(const ref of _uniqOficial([...TREFS,TID,_tenantSlug])){
-      try{
-        const snapRef=await db.collection('clientes').where('tenantId','==',ref).where('login','==',login).get();
-        snapRef.docs.forEach(d=>{if(!seen.has(d.id)){seen.add(d.id);docs.push(d);}});
-      }catch(e){}
-    }
-    if(!docs.length && USA_FIREBASE_INDIVIDUAL){
-      const snapLivre=await db.collection('clientes').where('login','==',login).get();
-      snapLivre.docs.forEach(d=>{if(!seen.has(d.id)){seen.add(d.id);docs.push(d);}});
-    }
-    if(!docs.length){ throw new Error('Login ou PIN incorretos.'); }
-    const matched=docs.find(d=>{const x=d.data(); return x.pin===pin || x.senha===pin || x.password===pin;});
+    const snap=await db.collection('clientes').where('tenantId','==',TID).where('login','==',login).get();
+    if(snap.empty){ throw new Error('Login ou PIN incorretos.'); }
+    const matched=snap.docs.find(d=>{const x=d.data(); return x.pin===pin || x.senha===pin || x.password===pin;});
     if(!matched){ throw new Error('Login ou PIN incorretos.'); }
     const data=matched.data();
     if(data.tipoCliente!=='governo'){
       throw new Error('Acesso restrito a clientes governamentais. Use o portal cliente.html.');
     }
     CLI={id:matched.id,...data};
-    _addTenantOficial(data.tenantId);
+    TID=data.tenantId;
     sessionStorage.setItem('govCli',JSON.stringify(CLI));
     sessionStorage.setItem('govTid',TID);
     salvarCredenciaisClienteOficial(login, pin);
     _carregarOficina().then(inicializar);
   }catch(e){
-    err.textContent='⚠ '+e.message; err.style.display='block';
+    err.textContent='âš  '+e.message; err.style.display='block';
     btn.innerHTML='ACESSAR PORTAL'; btn.disabled=false;
   }
 }
@@ -621,7 +619,7 @@ async function _prepararTenantPortal(tenantId){
     const found=await _resolverOficinaPortalOficial(tenantId);
     if(!found) return;
     _OFIC={id:found.id,...found.data};
-    _setTenantOficial(found, tenantId);
+    TID=found.id;
     try{sessionStorage.setItem('j_oficina',JSON.stringify(_OFIC));}catch(e){}
     if(_OFIC.firebaseConfig?.projectId&&_OFIC.firebaseConfig?.apiKey){
       sessionStorage.setItem('j_firebase_config',JSON.stringify(_OFIC.firebaseConfig));
@@ -633,23 +631,25 @@ async function _prepararTenantPortal(tenantId){
 async function inicializar(){
   document.getElementById('loginOverlay').style.display='none';
   document.getElementById('app').style.display='block';
-  document.getElementById('hdrUnidade').textContent=(CLI.govUnidade||CLI.nome||'—').toUpperCase();
-  document.getElementById('hdrSub').textContent=`CNPJ: ${CLI.doc||'—'} · Fiscal: ${CLI.govFiscal||'—'}`;
+  try{sessionStorage.setItem('j_oficina',JSON.stringify(_OFIC||{}));}catch(e){}
+  if(typeof window.thiaApplyModuleVisibility==='function') window.thiaApplyModuleVisibility(document);
+  document.getElementById('hdrUnidade').textContent=(CLI.govUnidade||CLI.nome||'â€”').toUpperCase();
+  document.getElementById('hdrSub').textContent=`CNPJ: ${CLI.doc||'â€”'} Â· Fiscal: ${CLI.govFiscal||'â€”'}`;
   _ligarListeners();
 }
 
-// ── LISTENERS REALTIME ─────────────────────────────────────────
+// â”€â”€ LISTENERS REALTIME â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function _ligarListeners(){
   // Viaturas
-  _colecaoTenantOficial('veiculos').where('clienteId','==',CLI.id).onSnapshot(snap=>{
+  db.collection('veiculos').where('tenantId','==',TID).where('clienteId','==',CLI.id).onSnapshot(snap=>{
     _VEIC=snap.docs.map(d=>({id:d.id,...d.data()}));
     _renderViaturas();
     const el=document.getElementById('agdVeiculo');
-    if(el) el.innerHTML='<option value="">Selecione a viatura...</option>'+_VEIC.map(v=>`<option value="${v.id}">${String(_pick(v.prefixo,v.placa)||'').toUpperCase()} — ${_pick(v.modelo)}</option>`).join('');
+    if(el) el.innerHTML='<option value="">Selecione a viatura...</option>'+_VEIC.map(v=>`<option value="${v.id}">${String(_pick(v.prefixo,v.placa)||'').toUpperCase()} â€” ${_pick(v.modelo)}</option>`).join('');
   });
 
   // OS
-  _colecaoTenantOficial('ordens_servico').where('clienteId','==',CLI.id).onSnapshot(snap=>{
+  db.collection('ordens_servico').where('tenantId','==',TID).where('clienteId','==',CLI.id).onSnapshot(snap=>{
     _OS=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>((b.updatedAt||'')>(a.updatedAt||''))?1:-1);
     _renderStats();
     _renderOS();
@@ -657,13 +657,13 @@ function _ligarListeners(){
   });
 
   // Mensagens
-  _colecaoTenantOficial('mensagens').where('clienteId','==',CLI.id).onSnapshot(snap=>{
+  db.collection('mensagens').where('tenantId','==',TID).where('clienteId','==',CLI.id).onSnapshot(snap=>{
     const msgs=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.ts||0)-(b.ts||0));
     _renderChat(msgs);
   });
 
   // Financeiro vinculado ao cliente oficial
-  _colecaoTenantOficial('financeiro').onSnapshot(snap=>{
+  db.collection('financeiro').where('tenantId','==',TID).onSnapshot(snap=>{
     _FIN=snap.docs.map(d=>({id:d.id,...d.data()})).filter(f=>!String(f.tipo||'').toLowerCase().startsWith('sa')&&!f.isComissao);
     _renderStats();
     _renderOS();
@@ -671,13 +671,13 @@ function _ligarListeners(){
   });
 
   // Agendamentos
-  _colecaoTenantOficial('agendamentos').where('clienteId','==',CLI.id).onSnapshot(snap=>{
+  db.collection('agendamentos').where('tenantId','==',TID).where('clienteId','==',CLI.id).onSnapshot(snap=>{
     const list=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>((b.data||'')>(a.data||''))?1:-1);
     _renderAgd(list);
   });
 }
 
-// ── STATS ──────────────────────────────────────────────────────
+// â”€â”€ STATS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function _renderStats(){
   const ativas=_OS.filter(o=>o.status!=='Entregue'&&o.status!=='Concluido');
   const osPeriodo=_OS.filter(_osDentroPeriodo);
@@ -689,18 +689,18 @@ function _renderStats(){
   _renderKpisSecao();
 }
 
-// ── RENDER OS ─────────────────────────────────────────────────
+// â”€â”€ RENDER OS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const STEPS=['patio','orcamento','aprovacao','box','pronto','faturado','entregue'];
-const STEP_LBL={patio:'Pátio',orcamento:'Orç.',aprovacao:'Aguard.',box:'Serviço',pronto:'Pronto',faturado:'Faturado',entregue:'Entreg.'};
+const STEP_LBL={patio:'PÃ¡tio',orcamento:'OrÃ§.',aprovacao:'Aguard.',box:'ServiÃ§o',pronto:'Pronto',faturado:'Faturado',entregue:'Entreg.'};
 const STATUS_MAP={'Aguardando':'patio','Triagem':'patio','Orcamento':'orcamento','Orcamento_Enviado':'aprovacao','Aprovado':'box','Andamento':'box','EmServico':'box','Pronto':'pronto','Pronto_Retirada':'pronto','Concluido':'entregue','Entregue':'entregue','Cancelado':'cancelado'};
 const PILL_MAP={'patio':'p-gov','orcamento':'p-orc','aprovacao':'p-orc','box':'p-ok','pronto':'p-ok','faturado':'p-ok','entregue':'p-ent','cancelado':'p-ent'};
-const PILL_TXT={'patio':'Pátio','orcamento':'Em Orçamento','aprovacao':'Aguard. Aprovação','box':'Em Execução','pronto':'Pronto p/ Retirada','faturado':'Faturado','entregue':'Entregue','cancelado':'Cancelado'};
+const PILL_TXT={'patio':'PÃ¡tio','orcamento':'Em OrÃ§amento','aprovacao':'Aguard. AprovaÃ§Ã£o','box':'Em ExecuÃ§Ã£o','pronto':'Pronto p/ Retirada','faturado':'Faturado','entregue':'Entregue','cancelado':'Cancelado'};
 
 function _renderOS(){
   const ativas=_OS.filter(o=>o.status!=='Entregue'&&o.status!=='Concluido');
   const el=document.getElementById('renderOS');
   if(!ativas.length){
-    el.innerHTML='<div class="empty" style="background:var(--bg1);border-radius:var(--rx);border:1px dashed var(--border);padding:40px"><div style="font-size:2.5rem;margin-bottom:10px">🚓</div>Sem OS ativas no momento.</div>';
+    el.innerHTML='<div class="empty" style="background:var(--bg1);border-radius:var(--rx);border:1px dashed var(--border);padding:40px"><div style="font-size:2.5rem;margin-bottom:10px">ðŸš“</div>Sem OS ativas no momento.</div>';
     return;
   }
   el.innerHTML=ativas.map(os=>_buildOSCard(os)).join('');
@@ -734,42 +734,42 @@ function _buildOSCard(os){
   </div>${(resumoFin.forma||vencsTxt)?`<div style="font-family:var(--mono);font-size:.68rem;color:var(--muted);line-height:1.5;margin-bottom:10px">${resumoFin.forma?`Pagamento: <strong style="color:var(--text)">${esc(resumoFin.forma)}</strong>`:''}${vencsTxt?`<br>Vencimentos: <strong style="color:var(--text)">${esc(vencsTxt)}</strong>`:''}</div>`:''}`;
 
   const stepper=isCancelado
-    ?`<div style="text-align:center;padding:22px;color:var(--err);font-weight:700;font-family:var(--disp);font-size:1.3rem">🚫 CANCELADA</div>`
+    ?`<div style="text-align:center;padding:22px;color:var(--err);font-weight:700;font-family:var(--disp);font-size:1.3rem">ðŸš« CANCELADA</div>`
     :`<div class="stepper-wrap"><div class="stepper">
         <div class="step-line"></div>
         <div class="step-line-fill" style="width:${fill}%"></div>
         ${STEPS.map((s,i)=>`<div class="step ${(i<stIdx||isEntregue)?'done':i===stIdx?'active':''}">
-          <div class="step-dot">${(i<stIdx||isEntregue)?'✓':i+1}</div>
+          <div class="step-dot">${(i<stIdx||isEntregue)?'âœ“':i+1}</div>
           <div class="step-lbl">${STEP_LBL[s]}</div>
         </div>`).join('')}
       </div></div>`;
 
   const bannerEntregue=isEntregue
     ?`<div style="margin:16px 18px;padding:14px;background:linear-gradient(135deg,var(--ok-dim),transparent);border-left:4px solid var(--ok);border-radius:0 var(--r) var(--r) 0">
-        <div style="font-family:var(--disp);font-size:1.1rem;font-weight:700;color:var(--ok);margin-bottom:4px">✅ Viatura Entregue</div>
-        <div style="font-size:.85rem;color:var(--text)">Serviço finalizado. Agradecemos a confiança!</div>
+        <div style="font-family:var(--disp);font-size:1.1rem;font-weight:700;color:var(--ok);margin-bottom:4px">âœ… Viatura Entregue</div>
+        <div style="font-size:.85rem;color:var(--text)">ServiÃ§o finalizado. Agradecemos a confianÃ§a!</div>
       </div>`:''
 
   const orcAlerta=isOrc
     ?`<div class="alerta-orc">
-        <div style="font-family:var(--disp);font-size:1.15rem;font-weight:700;color:var(--warn);margin-bottom:6px">📋 Orçamento Disponível para Aprovação</div>
+        <div style="font-family:var(--disp);font-size:1.15rem;font-weight:700;color:var(--warn);margin-bottom:6px">ðŸ“‹ OrÃ§amento DisponÃ­vel para AprovaÃ§Ã£o</div>
         ${resumoFinHtml}
         <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <button class="btn-aprovar" onclick="_aprovarOrc('${os.id}')">✓ APROVAR</button>
-          <button class="btn-negociar" onclick="_negociar('${esc(placa)}')">💬 NEGOCIAR</button>
+          <button class="btn-aprovar" onclick="_aprovarOrc('${os.id}')">âœ“ APROVAR</button>
+          <button class="btn-negociar" onclick="_negociar('${esc(placa)}')">ðŸ’¬ NEGOCIAR</button>
         </div>
       </div>`:''
 
   const revisao=(os.proxRev||os.proxKm)
     ?`<div style="margin:14px 18px;padding:14px;background:var(--ok-dim);border:1px solid var(--ok);border-radius:var(--r);display:flex;align-items:center;gap:12px">
-        <div style="font-size:1.4rem">📅</div>
+        <div style="font-size:1.4rem">ðŸ“…</div>
         <div style="font-size:.8rem;line-height:1.4;color:var(--ok)">
-          <strong>Próxima Revisão Sugerida:</strong><br>
+          <strong>PrÃ³xima RevisÃ£o Sugerida:</strong><br>
           ${os.proxRev?'Data: '+fmtDt(os.proxRev):''}${os.proxKm?' | KM: '+Number(os.proxKm).toLocaleString('pt-BR'):''}
         </div>
       </div>`:''
 
-  // Detalhes — aplica desconto do batalhão (govDescMO / govDescPeca) sobre valores brutos
+  // Detalhes â€” aplica desconto do batalhÃ£o (govDescMO / govDescPeca) sobre valores brutos
   const UOS = window.JOS || window.JarvisOSUtils || {};
   const parseBR = UOS.parseNumberBR || (v => parseFloat(String(v || 0).replace(',', '.')) || 0);
   const pctDescMOBase = os.descMO!=null ? parseBR(os.descMO) : parseBR(CLI.govDescMO || 0);
@@ -779,7 +779,7 @@ function _buildOSCard(os){
   const temAprovacao = UOS.hasApproval ? UOS.hasApproval(os) : false;
   const chavesAprovadas = UOS.getApprovedKeys ? UOS.getApprovedKeys(os) : new Set();
   const badgeAprovacao = key => temAprovacao
-    ? `<small style="display:inline-block;margin-left:6px;padding:2px 6px;border-radius:3px;border:1px solid ${chavesAprovadas.has(key) ? 'rgba(77,208,143,.35)' : 'rgba(255,77,109,.35)'};color:${chavesAprovadas.has(key) ? 'var(--ok)' : 'var(--danger)'};font-family:var(--mono);font-size:.56rem;">${chavesAprovadas.has(key) ? 'APROVADO' : 'NÃO APROVADO'}</small>`
+    ? `<small style="display:inline-block;margin-left:6px;padding:2px 6px;border-radius:3px;border:1px solid ${chavesAprovadas.has(key) ? 'rgba(77,208,143,.35)' : 'rgba(255,77,109,.35)'};color:${chavesAprovadas.has(key) ? 'var(--ok)' : 'var(--danger)'};font-family:var(--mono);font-size:.56rem;">${chavesAprovadas.has(key) ? 'APROVADO' : 'NÃƒO APROVADO'}</small>`
     : '';
 
   let totalMO=0,totalTMO=0,totalPec=0;
@@ -787,12 +787,12 @@ function _buildOSCard(os){
     const t=parseBR(s.tempo||0);
     const vBruto=parseBR(s.valor||0);
     const valorHora=parseBR(s.valorHora || (t > 0 ? vBruto / t : 0));
-    const secao=s.secaoHoraLabel || s.sistemaTabela || s.sistema || 'Seção manual';
+    const secao=s.secaoHoraLabel || s.sistemaTabela || s.sistema || 'SeÃ§Ã£o manual';
     const tipoVeic=_tipoVeiculoServicoKPI(s,os);
     const vf=+(vBruto*(1-pctDescMO)).toFixed(2);
     totalMO+=vf; totalTMO+=t;
     const riscado=pctDescMO>0?`<span style="color:var(--muted);text-decoration:line-through;font-size:.75rem">${moeda(vBruto)}</span> <span style="color:var(--ok);font-size:.7rem">-${(pctDescMO*100).toFixed(0)}%</span> `:'';
-    return `<div class="detalhe-row"><span>${s.codigoTabela||s.codigo?`<code style="font-size:.7rem;color:var(--gov)">${esc(s.codigoTabela||s.codigo)}</code> `:''}${esc(s.desc||'—')}${badgeAprovacao('servico-'+idx)}<br><small style="color:var(--muted)">${esc(secao)}${tipoVeic?` · Tipo veículo: ${esc(tipoVeic)}`:''}${t?` · ${String(t).replace('.',',')}h`:''}${valorHora?` · ${moeda(valorHora)}/h`:''}</small></span><span class="detalhe-val" style="text-align:right">${riscado}${moeda(vf)}</span></div>`;
+    return `<div class="detalhe-row"><span>${s.codigoInterno||s.codigoTabela||s.codigo?`<code style="font-size:.7rem;color:var(--gov)">${esc(s.codigoInterno||s.codigoTabela||s.codigo)}</code> `:''}${esc(s.desc||'â€”')}${badgeAprovacao('servico-'+idx)}<br><small style="color:var(--muted)">${s.codigoInterno&&s.codigoTabela&&s.codigoTabela!==s.codigoInterno?`SIAFISICO ${esc(s.codigoTabela)} Â· `:``}${esc(secao)}${tipoVeic?` Â· Tipo veÃ­culo: ${esc(tipoVeic)}`:''}${t?` Â· ${String(t).replace('.',',')}h`:''}${valorHora?` Â· ${moeda(valorHora)}/h`:''}</small></span><span class="detalhe-val" style="text-align:right">${riscado}${moeda(vf)}</span></div>`;
   }).join('');
 
   const lsPec=(os.pecas||[]).map((p,idx)=>{
@@ -801,17 +801,17 @@ function _buildOSCard(os){
     const vf=+(vBruto*(1-pctDescPeca)).toFixed(2);
     totalPec+=vf;
     const riscado=pctDescPeca>0?`<span style="color:var(--muted);text-decoration:line-through;font-size:.75rem">${moeda(vBruto)}</span> <span style="color:var(--ok);font-size:.7rem">-${(pctDescPeca*100).toFixed(0)}%</span> `:'';
-    return `<div class="detalhe-row"><span><code style="font-size:.7rem;color:var(--gov)">${esc(p.codigo||'—')}</code> ${esc(p.desc||'—')}${badgeAprovacao('peca-'+idx)}<br><small style="color:var(--muted)">${q}× ${moeda(vl)}</small></span><span class="detalhe-val" style="text-align:right">${riscado}${moeda(vf)}</span></div>`;
+    return `<div class="detalhe-row"><span><code style="font-size:.7rem;color:var(--gov)">${esc(p.codigo||'â€”')}</code> ${esc(p.desc||'â€”')}${badgeAprovacao('peca-'+idx)}<br><small style="color:var(--muted)">${q}Ã— ${moeda(vl)}</small></span><span class="detalhe-val" style="text-align:right">${riscado}${moeda(vf)}</span></div>`;
   }).join('');
 
   const fotos=((os.media||[]).concat(os.fotos||[])).filter(m=>m);
   const fotosHtml=fotos.length?`
     <div style="margin-top:18px">
-      <div style="font-family:var(--mono);font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Evidências / Fotos</div>
+      <div style="font-family:var(--mono);font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">EvidÃªncias / Fotos</div>
       <div class="media-grid">${fotos.map(m=>`<div class="media-item"><img src="${esc(m.url||m)}" loading="lazy" onclick="window.open('${esc(m.url||m)}','_blank')"></div>`).join('')}</div>
     </div>`:'';
 
-  // Linha do tempo: apenas mudanças de status (filtra logs de auditoria técnica)
+  // Linha do tempo: apenas mudanÃ§as de status (filtra logs de auditoria tÃ©cnica)
   const tlFiltrado=(os.timeline||[]).filter(t=>{
     if(t.tipo==='status_os'||t.visivelCliente===true) return true;
     const a=(t.acao||'').toLowerCase();
@@ -822,11 +822,11 @@ function _buildOSCard(os){
     if(t.tipo==='status_os'){
       return `Status atualizado para ${String(t.statusNovo||'').replace('_',' ')} por ${t.user||t.usuario||'Sistema'}.`;
     }
-    return (t.acao||'').replace(/^Status alterado para:\s*/i,'').replace(/^Abriu a O\.S\.\s*/i,'Entrada na oficina — ');
+    return (t.acao||'').replace(/^Status alterado para:\s*/i,'').replace(/^Abriu a O\.S\.\s*/i,'Entrada na oficina â€” ');
   };
 
   const tlHtml=`<div class="timeline-box">
-    <div class="tl-title">📍 Histórico de Status</div>
+    <div class="tl-title">ðŸ“ HistÃ³rico de Status</div>
     <div class="timeline">
       ${tlParaExibir.length?[...tlParaExibir].reverse().map(t=>`
         <div class="tl-item">
@@ -841,14 +841,14 @@ function _buildOSCard(os){
 
   const detalhes=`<div class="os-details">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.05)">
-      <div><div style="font-family:var(--mono);font-size:.63rem;color:var(--muted);margin-bottom:2px">VEÍCULO</div><div style="font-weight:700">${esc(marcaVeic)} ${esc(modeloVeic)}</div></div>
-      <div><div style="font-family:var(--mono);font-size:.63rem;color:var(--muted);margin-bottom:2px">ANO / PREFIXO</div><div style="font-weight:700">${esc(anoVeic||'—')} / ${esc(prefixoVeic||'—')}</div></div>
-      <div><div style="font-family:var(--mono);font-size:.63rem;color:var(--muted);margin-bottom:2px">CHASSIS</div><div style="font-family:var(--mono);font-size:.75rem">${esc(chassisVeic||'—')}</div></div>
-      <div><div style="font-family:var(--mono);font-size:.63rem;color:var(--muted);margin-bottom:2px">PATRIMÔNIO</div><div style="font-family:var(--mono);font-size:.75rem">${esc(patrimonioVeic||'—')}</div></div>
+      <div><div style="font-family:var(--mono);font-size:.63rem;color:var(--muted);margin-bottom:2px">VEÃCULO</div><div style="font-weight:700">${esc(marcaVeic)} ${esc(modeloVeic)}</div></div>
+      <div><div style="font-family:var(--mono);font-size:.63rem;color:var(--muted);margin-bottom:2px">ANO / PREFIXO</div><div style="font-weight:700">${esc(anoVeic||'â€”')} / ${esc(prefixoVeic||'â€”')}</div></div>
+      <div><div style="font-family:var(--mono);font-size:.63rem;color:var(--muted);margin-bottom:2px">CHASSIS</div><div style="font-family:var(--mono);font-size:.75rem">${esc(chassisVeic||'â€”')}</div></div>
+      <div><div style="font-family:var(--mono);font-size:.63rem;color:var(--muted);margin-bottom:2px">PATRIMÃ”NIO</div><div style="font-family:var(--mono);font-size:.75rem">${esc(patrimonioVeic||'â€”')}</div></div>
     </div>
 
     ${os.diagnostico||os.relato?`<div style="margin-bottom:16px">
-      <div style="font-family:var(--mono);font-size:.63rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Diagnóstico Técnico</div>
+      <div style="font-family:var(--mono);font-size:.63rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">DiagnÃ³stico TÃ©cnico</div>
       <div style="font-size:.85rem;background:rgba(0,0,0,.2);padding:12px;border-radius:var(--r);border-left:3px solid var(--gov)">${esc(os.diagnostico||os.relato||'')}</div>
     </div>`:''}
 
@@ -856,15 +856,15 @@ function _buildOSCard(os){
     ${_kpisSecaoOSHtml(os)}
 
     ${lsServ?`<div style="margin-bottom:16px">
-      <div style="font-family:var(--mono);font-size:.63rem;color:var(--brand);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">MÃO DE OBRA (${totalTMO.toFixed(2).replace('.',',')}h)${pctDescMO>0?` · Desc. contrato: ${(pctDescMO*100).toFixed(0)}%`:''}</div>
+      <div style="font-family:var(--mono);font-size:.63rem;color:var(--brand);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">MÃƒO DE OBRA (${totalTMO.toFixed(2).replace('.',',')}h)${pctDescMO>0?` Â· Desc. contrato: ${(pctDescMO*100).toFixed(0)}%`:''}</div>
       ${lsServ}
       <div style="display:flex;justify-content:flex-end;padding-top:6px;font-family:var(--mono);font-size:.75rem;color:var(--muted)">Subtotal MO c/ desconto: <strong style="color:var(--text);margin-left:8px">${moeda(totalMO)}</strong></div>
     </div>`:''}
 
     ${lsPec?`<div style="margin-bottom:16px">
-      <div style="font-family:var(--mono);font-size:.63rem;color:var(--ok);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">PEÇAS APLICADAS${pctDescPeca>0?` · Desc. contrato: ${(pctDescPeca*100).toFixed(0)}%`:''}</div>
+      <div style="font-family:var(--mono);font-size:.63rem;color:var(--ok);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">PEÃ‡AS APLICADAS${pctDescPeca>0?` Â· Desc. contrato: ${(pctDescPeca*100).toFixed(0)}%`:''}</div>
       ${lsPec}
-      <div style="display:flex;justify-content:flex-end;padding-top:6px;font-family:var(--mono);font-size:.75rem;color:var(--muted)">Subtotal Peças c/ desconto: <strong style="color:var(--text);margin-left:8px">${moeda(totalPec)}</strong></div>
+      <div style="display:flex;justify-content:flex-end;padding-top:6px;font-family:var(--mono);font-size:.75rem;color:var(--muted)">Subtotal PeÃ§as c/ desconto: <strong style="color:var(--text);margin-left:8px">${moeda(totalPec)}</strong></div>
     </div>`:''}
 
     ${lsServ||lsPec?`<div style="background:var(--gov-dim);border:1px solid var(--border-s);border-radius:var(--r);padding:14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
@@ -891,29 +891,29 @@ function _buildOSCard(os){
       </div>
     </div>
     ${stepper}${bannerEntregue}${orcAlerta}${!isOrc?`<div style="padding:0 18px 12px">${resumoFinHtml}</div>`:''}${revisao}
-    <button class="btn-toggle" onclick="this.closest('.os-card').classList.toggle('expanded')">▼ VER DETALHAMENTO E LINHA DO TEMPO</button>
+    <button class="btn-toggle" onclick="this.closest('.os-card').classList.toggle('expanded')">â–¼ VER DETALHAMENTO E LINHA DO TEMPO</button>
     ${detalhes}
   </div>`;
 }
 
-// ── VIATURAS ──────────────────────────────────────────────────
+// â”€â”€ VIATURAS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function _renderViaturas(){
   const tb=document.getElementById('tbViat');
   if(!_VEIC.length){ tb.innerHTML='<tr><td colspan="5" class="empty">Nenhuma viatura cadastrada.</td></tr>'; return; }
   tb.innerHTML=_VEIC.map(v=>`<tr>
-    <td><strong>${esc(String(_pick(v.prefixo,v.placa)||'').toUpperCase())||'—'}</strong></td>
-    <td>${esc(_pick(v.marca))} ${esc(_pick(v.modelo))}<br><small style="color:var(--muted)">Ano ${esc(_pick(v.ano)||'—')}</small></td>
+    <td><strong>${esc(String(_pick(v.prefixo,v.placa)||'').toUpperCase())||'â€”'}</strong></td>
+    <td>${esc(_pick(v.marca))} ${esc(_pick(v.modelo))}<br><small style="color:var(--muted)">Ano ${esc(_pick(v.ano)||'â€”')}</small></td>
     <td style="font-family:var(--mono);font-weight:700">${esc((v.placa||'').toUpperCase())}</td>
-    <td style="font-family:var(--mono)">${esc(_pick(v.patrimonio,v.patrimonioNumero,v.patrimonioId)||'—')}</td>
-    <td style="font-family:var(--mono)">${esc(v.km||'—')}</td>
+    <td style="font-family:var(--mono)">${esc(_pick(v.patrimonio,v.patrimonioNumero,v.patrimonioId)||'â€”')}</td>
+    <td style="font-family:var(--mono)">${esc(v.km||'â€”')}</td>
   </tr>`).join('');
 }
 
-// ── HISTÓRICO ─────────────────────────────────────────────────
+// â”€â”€ HISTÃ“RICO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function _renderHist(){
   const tb=document.getElementById('tbHist');
   const conc=_OS.filter(o=>(o.status==='Entregue'||o.status==='Concluido')&&_osDentroPeriodo(o));
-  if(!conc.length){ tb.innerHTML='<tr><td colspan="5" class="empty">Sem serviços concluídos.</td></tr>'; return; }
+  if(!conc.length){ tb.innerHTML='<tr><td colspan="5" class="empty">Sem serviÃ§os concluÃ­dos.</td></tr>'; return; }
   tb.innerHTML=conc.slice(0,60).map(o=>{
     const v=_VEIC.find(x=>x.id===o.veiculoId)||{};
     const resumo=_resumoFinanceiroOS(o);
@@ -922,7 +922,7 @@ function _renderHist(){
       <td>${esc(String(_pick(v.prefixo,v.placa,o.placa)||'').toUpperCase())}<br><small style="color:var(--muted)">${esc(_pick(v.modelo,o.veiculo,o.modelo))}</small></td>
       <td>${fmtDt(o.updatedAt||o.data)}</td>
       <td style="text-align:right;font-family:var(--mono);font-weight:700;color:var(--ok)">${moeda(resumo.faturado||resumo.aprovado||resumo.orcamento)}</td>
-      <td><button onclick="abrirHistOS('${o.id}')" style="background:var(--gov-dim);border:1px solid var(--border-s);color:var(--gov);padding:6px 12px;border-radius:var(--r);font-family:var(--mono);font-size:.65rem;cursor:pointer;white-space:nowrap">▶ VER</button></td>
+      <td><button onclick="abrirHistOS('${o.id}')" style="background:var(--gov-dim);border:1px solid var(--border-s);color:var(--gov);padding:6px 12px;border-radius:var(--r);font-family:var(--mono);font-size:.65rem;cursor:pointer;white-space:nowrap">â–¶ VER</button></td>
     </tr>`;
   }).join('');
 }
@@ -934,7 +934,7 @@ function abrirHistOS(id){
   // Injeta no modal e abre expandido
   const el=document.getElementById('modalHistConteudo');
   el.innerHTML=card;
-  // Força expansão do card
+  // ForÃ§a expansÃ£o do card
   const osCard=el.querySelector('.os-card');
   if(osCard) osCard.classList.add('expanded');
   document.getElementById('modalHistOS').style.display='block';
@@ -947,7 +947,7 @@ function fecharModalHist(){
   document.body.style.overflow='';
 }
 
-// ── APROVAR ORÇAMENTO ─────────────────────────────────────────
+// â”€â”€ APROVAR ORÃ‡AMENTO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function _aprovarOrc(osId){
   try{
     const result = await (window.JOS || window.JarvisOSUtils).aprovarOrcamentoComSelecao({
@@ -956,22 +956,22 @@ async function _aprovarOrc(osId){
       novoStatus: 'Aprovado',
       cliente: CLI,
       clientes: CLI ? [CLI] : [],
-      actorName: CLI.govUnidade || CLI.nome || 'Órgão',
+      actorName: CLI.govUnidade || CLI.nome || 'Ã“rgÃ£o',
       actorType: 'clienteOficial',
       toast
     });
     if(!result) return;
-    toast('Orçamento aprovado com os itens selecionados. A oficina dará sequência ao fluxo da O.S.','ok');
+    toast('OrÃ§amento aprovado com os itens selecionados. A oficina darÃ¡ sequÃªncia ao fluxo da O.S.','ok');
   }catch(e){ toast('Erro ao aprovar: '+e.message,'err'); }
 }
 
 function _negociar(placa){
   trocarTab('tChat',document.querySelectorAll('.tab-btn')[1]);
   const inp=document.getElementById('chatInput');
-  if(inp){ inp.value=`Gostaria de negociar o orçamento referente à viatura ${placa}. `; inp.focus(); }
+  if(inp){ inp.value=`Gostaria de negociar o orÃ§amento referente Ã  viatura ${placa}. `; inp.focus(); }
 }
 
-// ── CHAT ─────────────────────────────────────────────────────
+// â”€â”€ CHAT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function _escChat(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function _escAttr(s){ return String(s==null?'':s).replace(/["<>]/g,c=>({"'":'&quot;','<':'&lt;','>':'&gt;'}[c])); }
 
@@ -985,7 +985,7 @@ function _formatMidia(txt){
   const u=_escAttr(url);
   if(tipo==='AUDIO') return `<audio src="${u}" controls preload="metadata" style="height:40px;max-width:100%;border-radius:20px"></audio>`;
   if(tipo==='IMAGEM') return `<img src="${u}" loading="lazy" style="max-width:100%;max-height:240px;border-radius:var(--r);cursor:zoom-in;border:1px solid var(--border)" onclick="window.open('${u}','_blank')">`;
-  if(tipo==='ARQUIVO') return `<a href="${u}" target="_blank" rel="noopener" style="color:var(--gov);text-decoration:underline;font-weight:700">📎 Abrir Anexo</a>`;
+  if(tipo==='ARQUIVO') return `<a href="${u}" target="_blank" rel="noopener" style="color:var(--gov);text-decoration:underline;font-weight:700">ðŸ“Ž Abrir Anexo</a>`;
   return _escChat(s);
 }
 
@@ -1000,7 +1000,7 @@ function _renderChat(msgs){
   ct.innerHTML=msgs.map(m=>{
     const t=m.ts?new Date(m.ts).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'';
     const dir=m.sender==='cliente'?'out':'inc';
-    const author=m.sender==='cliente'?'Você':(_OFIC?.nomeFantasia||'Oficina');
+    const author=m.sender==='cliente'?'VocÃª':(_OFIC?.nomeFantasia||'Oficina');
     return `<div class="chat-msg ${dir}"><div class="chat-author">${_escChat(author)}</div>${_formatMidia(m.msg)}<div class="chat-time">${t}</div></div>`;
   }).join('');
   ct.scrollTop=ct.scrollHeight;
@@ -1040,12 +1040,12 @@ async function _enviarArquivo(input){
   finally{ try{input.value=''}catch(e){} }
 }
 
-// PTT (gravação de áudio)
+// PTT (gravaÃ§Ã£o de Ã¡udio)
 let _isRec=false,_mr,_chunks=[],_pttState={stream:null,mime:''};
 async function _togglePtt(){
   const btn=document.getElementById('btnPtt');
   if(_isRec&&_mr&&_mr.state==='recording'){ try{_mr.stop()}catch(e){}; return; }
-  if(!navigator.mediaDevices||typeof MediaRecorder==='undefined'){ toast('Navegador não suporta gravação.','err'); return; }
+  if(!navigator.mediaDevices||typeof MediaRecorder==='undefined'){ toast('Navegador nÃ£o suporta gravaÃ§Ã£o.','err'); return; }
   try{
     const stream=await navigator.mediaDevices.getUserMedia({audio:true});
     let mime='';
@@ -1059,10 +1059,10 @@ async function _togglePtt(){
     _mr.ondataavailable=e=>{ if(e.data&&e.data.size>0) _chunks.push(e.data); };
     _mr.onstop=async()=>{
       if(_pttState.stream){ try{_pttState.stream.getTracks().forEach(t=>t.stop())}catch(e){} }
-      _isRec=false; btn.style.background='var(--bg3)'; btn.style.borderColor='var(--border)'; btn.innerHTML='🎤';
-      if(!_chunks.length){ toast('Gravação vazia.','err'); return; }
+      _isRec=false; btn.style.background='var(--bg3)'; btn.style.borderColor='var(--border)'; btn.innerHTML='ðŸŽ¤';
+      if(!_chunks.length){ toast('GravaÃ§Ã£o vazia.','err'); return; }
       const blob=new Blob(_chunks,{type:_pttState.mime});
-      if(blob.size<500){ toast('Áudio muito curto.','err'); return; }
+      if(blob.size<500){ toast('Ãudio muito curto.','err'); return; }
       btn.innerHTML='<span class="spinner"></span>'; btn.disabled=true;
       try{
         const fd=new FormData();
@@ -1070,24 +1070,24 @@ async function _togglePtt(){
         fd.append('upload_preset',_OFIC?.cloudPreset||'evolution');
         const res=await fetch(`https://api.cloudinary.com/v1_1/${_OFIC?.cloudName||'dmuvm1o6m'}/auto/upload`,{method:'POST',body:fd});
         const data=await res.json();
-        if(!data.secure_url) throw new Error('Falha no upload do áudio');
+        if(!data.secure_url) throw new Error('Falha no upload do Ã¡udio');
         await db.collection('mensagens').add({tenantId:TID,clienteId:CLI.id,sender:'cliente',msg:'[AUDIO]'+data.secure_url,lidaAdmin:false,lidaCliente:true,ts:Date.now()});
-        toast('Áudio enviado!','ok');
-      }catch(e){ toast('Erro ao enviar áudio: '+e.message,'err'); }
-      finally{ btn.innerHTML='🎤'; btn.disabled=false; }
+        toast('Ãudio enviado!','ok');
+      }catch(e){ toast('Erro ao enviar Ã¡udio: '+e.message,'err'); }
+      finally{ btn.innerHTML='ðŸŽ¤'; btn.disabled=false; }
     };
     _mr.start();
-    btn.style.background='var(--err)'; btn.style.borderColor='var(--err)'; btn.innerHTML='⏹';
-    toast('🔴 Gravando... Clique ⏹ para parar.','warn');
-  }catch(e){ toast('Permissão de microfone negada.','err'); }
+    btn.style.background='var(--err)'; btn.style.borderColor='var(--err)'; btn.innerHTML='â¹';
+    toast('ðŸ”´ Gravando... Clique â¹ para parar.','warn');
+  }catch(e){ toast('PermissÃ£o de microfone negada.','err'); }
 }
 
-// ── AGENDAMENTO ───────────────────────────────────────────────
+// â”€â”€ AGENDAMENTO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function _salvarAgendamento(){
   const data=document.getElementById('agdData').value;
   const servico=document.getElementById('agdServico').value.trim();
   const veicId=document.getElementById('agdVeiculo').value;
-  if(!data||!servico||!veicId){ toast('Selecione viatura, data e descreva o serviço.','warn'); return; }
+  if(!data||!servico||!veicId){ toast('Selecione viatura, data e descreva o serviÃ§o.','warn'); return; }
   try{
     await db.collection('agendamentos').add({tenantId:TID,clienteId:CLI.id,veiculoId:veicId,data,servico,status:'Solicitado',createdAt:new Date().toISOString()});
     toast('Agendamento solicitado com sucesso!','ok');
@@ -1102,8 +1102,8 @@ function _renderAgd(list){
     const v=_VEIC.find(x=>x.id===a.veiculoId)||{};
     return `<div style="background:var(--bg1);border:1px solid var(--border);border-left:4px solid var(--gov);padding:14px 16px;border-radius:var(--r);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
       <div>
-        <div style="font-size:.9rem;font-weight:700;color:#fff">${esc(a.servico||'Revisão')}</div>
-        <div style="font-family:var(--mono);font-size:.7rem;color:var(--muted);margin-top:5px">🗓️ ${a.data?new Date(a.data+'T12:00:00').toLocaleDateString('pt-BR'):'—'} ${v.prefixo?`<span style="color:var(--gov)">| 🚓 ${esc((v.prefixo||'').toUpperCase())}</span>`:''}
+        <div style="font-size:.9rem;font-weight:700;color:#fff">${esc(a.servico||'RevisÃ£o')}</div>
+        <div style="font-family:var(--mono);font-size:.7rem;color:var(--muted);margin-top:5px">ðŸ—“ï¸ ${a.data?new Date(a.data+'T12:00:00').toLocaleDateString('pt-BR'):'â€”'} ${v.prefixo?`<span style="color:var(--gov)">| ðŸš“ ${esc((v.prefixo||'').toUpperCase())}</span>`:''}
         </div>
       </div>
       <span class="pill p-gov">${esc(a.status||'Solicitado')}</span>
@@ -1112,7 +1112,50 @@ function _renderAgd(list){
   el.innerHTML=`<div style="font-family:var(--disp);font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:14px;margin-top:24px">Meus Agendamentos</div>${html}`;
 }
 
-// ── TABS ──────────────────────────────────────────────────────
+function tempaOficialLiberada(){
+  const modOk = (!window.thiaModEnabled || (window.thiaModEnabled('clienteOficial') && window.thiaModEnabled('tabelaTempa')));
+  const subOk = (!window.thiaSubEnabled || window.thiaSubEnabled('cliente.tabelaTempaOficial'));
+  return !!(modOk && subOk);
+}
+
+async function renderTempaOficial(){
+  const tbody=document.getElementById('tempaOficialBody');
+  const status=document.getElementById('tempaOficialStatus');
+  if(!tbody) return;
+  if(!tempaOficialLiberada()){
+    tbody.innerHTML='<tr><td colspan="5" class="empty">Consulta nao liberada para este portal.</td></tr>';
+    if(status) status.textContent='';
+    return;
+  }
+  try{
+    if(typeof window.tempaCarregar==='function') await window.tempaCarregar();
+  }catch(e){
+    tbody.innerHTML='<tr><td colspan="5" class="empty">Nao foi possivel carregar a Tabela Temparia.</td></tr>';
+    if(status) status.textContent=e.message||String(e);
+    return;
+  }
+  const termo=(document.getElementById('tempaOficialBusca')?.value||'').trim();
+  const lista=termo && typeof window.tempaBuscarPorTexto==='function'
+    ? window.tempaBuscarPorTexto(termo,{limite:120})
+    : (window._tabelaTempa?.dados?.itens||[]).slice(0,50);
+  if(status) status.textContent=termo ? `${lista.length} resultado(s). Consulta somente leitura.` : 'Mostrando primeiros 50 itens. Digite para filtrar.';
+  if(!lista.length){
+    tbody.innerHTML='<tr><td colspan="5" class="empty">Nenhum item encontrado.</td></tr>';
+    return;
+  }
+  tbody.innerHTML=lista.map(it=>{
+    const tempo=Number(it.tempo||0);
+    return `<tr>
+      <td><code style="font-size:.7rem;color:var(--gov)">${esc(it.codigoInterno||'-')}</code></td>
+      <td><code style="font-size:.7rem;color:var(--muted)">${esc(it.codigo||'-')}</code></td>
+      <td>${esc(it.sistema||'-')}</td>
+      <td><b>${esc(it.operacao||'')}</b> ${esc(it.item||'')}</td>
+      <td style="text-align:right;font-family:var(--mono);color:var(--ok)">${tempo.toFixed(2).replace('.',',')}h</td>
+    </tr>`;
+  }).join('');
+}
+
+// â”€â”€ TABS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function trocarTab(id,btn){
   document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
@@ -1123,13 +1166,13 @@ function trocarTab(id,btn){
   }
 }
 
-// ── SAIR ──────────────────────────────────────────────────────
+// â”€â”€ SAIR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function sair(){
   sessionStorage.removeItem('govCli'); sessionStorage.removeItem('govTid'); sessionStorage.removeItem('j_firebase_config');
   location.reload();
 }
 
-// ── AUTO-LOGIN ────────────────────────────────────────────────
+// â”€â”€ AUTO-LOGIN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 (function(){
   _tenantReady.then(()=>{
     const cached=sessionStorage.getItem('govCli');

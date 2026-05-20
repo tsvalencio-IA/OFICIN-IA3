@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
 <script>(function(){try{var t=localStorage.getItem("thiaguinho_theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);else document.documentElement.setAttribute("data-theme","dark");}catch(e){document.documentElement.setAttribute("data-theme","dark");}})();</script>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>J.A.R.V.I.S — SUPERADMIN SaaS</title>
 <!-- ═══ PWA ═══ -->
@@ -24,7 +24,6 @@ if ('serviceWorker' in navigator) {
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="js/links-publicos.js"></script>
 <script src="js/tenant-modules.js"></script>
-<script src="js/brasil-cadastros.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=JetBrains+Mono:wght@400;700&family=Exo+2:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -130,13 +129,12 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .overlay.open{display:flex;}
 .modal{background:var(--surf2);border:1px solid var(--border2);border-radius:4px;width:100%;max-width:700px;margin:auto;position:relative;}
 .modal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--purple),transparent);}
-.modal-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;position:sticky;top:0;z-index:8;background:var(--surf2);}
+.modal-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
 .modal-title{font-family:var(--fd);font-size:1.1rem;font-weight:700;letter-spacing:2px;color:var(--purple);}
-.modal-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
 .modal-close{background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer;padding:4px 8px;}
 .modal-close:hover{color:var(--danger);}
 .modal-body{padding:20px;}
-.modal-foot{padding:14px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;position:sticky;bottom:0;z-index:8;background:var(--surf2);}
+.modal-foot{padding:14px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;}
 
 /* PILL */
 .pill{display:inline-block;padding:2px 9px;border-radius:10px;font-family:var(--fm);font-size:0.58rem;letter-spacing:1px;}
@@ -192,7 +190,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
     <div class="nav-item active" onclick="ir('s-dashboard',this)">📊 Dashboard</div>
     <div class="nav-item" onclick="ir('s-tenants',this)">🏢 Oficinas (Tenants)</div>
     <div class="nav-sec">CONFIGURAÇÃO</div>
-    <div class="nav-item" onclick="ir('s-ia',this)">🤖 IA / Cérebro</div>
+    <div class="nav-item" onclick="ir('s-ia',this)">🤖 IA / Gemini Key</div>
     <div class="nav-item" onclick="ir('s-saas',this)">💰 Financeiro SaaS</div>
     <div class="nav-sec">SUPORTE</div>
     <div class="nav-item" onclick="ir('s-auditoria',this)">🔒 Auditoria Global</div>
@@ -223,7 +221,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
       <div class="j-card">
         <div class="j-card-head"><div class="j-card-title">🏢 OFICINAS CADASTRADAS</div><button class="btn-primary" onclick="ir('s-tenants',document.querySelector('.nav-item:nth-child(2)'));prepTenant('add');abrirModal('modalTenant')">+ NOVA OFICINA</button></div>
         <div style="padding:0;overflow-x:auto;">
-          <table class="j-table"><thead><tr><th>Oficina</th><th>Nicho</th><th>Acesso</th><th>Status</th><th>Plano</th><th>IA / Cérebro</th></tr></thead><tbody id="dashTenants"></tbody></table>
+          <table class="j-table"><thead><tr><th>Oficina</th><th>Nicho</th><th>Acesso</th><th>Status</th><th>Plano</th><th>IA Key</th></tr></thead><tbody id="dashTenants"></tbody></table>
         </div>
       </div>
     </div>
@@ -252,23 +250,19 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
     <div class="section" id="s-ia">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
         <div class="j-card">
-          <div class="j-card-head"><div class="j-card-title">CÉREBRO GLOBAL / CLOUDINARY</div></div>
+          <div class="j-card-head"><div class="j-card-title">🔑 CHAVES GLOBAIS DA API</div></div>
           <div style="padding:18px;">
+            <div class="form-group"><label class="j-label">Google Gemini API Key (Global)</label><input type="password" class="j-input" id="iaGeminiKey" placeholder="AIzaSy..."></div>
             <div class="form-group"><label class="j-label">Cloudinary Cloud Name</label><input class="j-input" id="iaCloudName" placeholder="dmuvm1o6m"></div>
             <div class="form-group"><label class="j-label">Cloudinary Upload Preset</label><input class="j-input" id="iaCloudPreset" placeholder="evolution"></div>
-            <div class="form-group"><label class="j-label">JSON do cérebro global</label><textarea class="j-input" id="iaBrainGlobalJson" rows="7" placeholder='{"versao":1,"escopo":"global","comportamento":{"tom":"direto","permitirPiadas":false},"conhecimento":[]}' style="resize:vertical;min-height:150px;font-family:var(--fm);"></textarea></div>
-            <div class="form-row c2">
-              <button class="btn-ghost" type="button" onclick="gerarModeloCerebroGlobal()">GERAR MODELO JSON</button>
-              <input class="j-input" type="file" id="iaBrainGlobalFile" accept=".json,application/json" onchange="importarCerebroGlobalArquivo(this)" title="Importa e complementa. Não sobrescreve o cérebro atual.">
-            </div>
-            <button class="btn-cyan" onclick="salvarConfigIA()" style="width:100%;padding:10px;justify-content:center;">SALVAR CONFIGURAÇÃO LOCAL</button>
+            <button class="btn-cyan" onclick="salvarConfigIA()" style="width:100%;padding:10px;justify-content:center;">SALVAR E PROPAGAR PARA TODOS OS TENANTS</button>
           </div>
         </div>
         <div class="j-card">
-          <div class="j-card-head"><div class="j-card-title">TESTAR CÉREBRO LOCAL</div></div>
+          <div class="j-card-head"><div class="j-card-title">🎙️ TESTAR GEMINI</div></div>
           <div style="padding:18px;">
-            <div class="form-group"><label class="j-label">Pergunta de Teste</label><textarea class="j-input" id="iaTestInput" rows="3" placeholder="Pergunte sobre tenants, módulos, riscos ou cérebro global..." style="resize:vertical;min-height:80px;"></textarea></div>
-            <button class="btn-primary" onclick="testarCerebroLocal()" style="margin-bottom:12px;">TESTAR AGORA</button>
+            <div class="form-group"><label class="j-label">Pergunta de Teste</label><textarea class="j-input" id="iaTestInput" rows="3" placeholder="Teste a API aqui..." style="resize:vertical;min-height:80px;"></textarea></div>
+            <button class="btn-primary" onclick="testarGemini()" style="margin-bottom:12px;">TESTAR AGORA</button>
             <div id="iaTestResult" style="background:rgba(0,0,0,0.3);border-radius:3px;padding:12px;font-size:0.8rem;min-height:60px;color:var(--muted2);display:none;font-family:var(--fm);line-height:1.6;"></div>
           </div>
         </div>
@@ -305,10 +299,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 <div class="modal">
   <div class="modal-head">
     <div class="modal-title" id="modalTenantTitle">NOVA OFICINA (TENANT)</div>
-    <div class="modal-actions">
-      <button class="btn-success" type="button" onclick="salvarTenant({manterAberto:true})">SALVAR SEM FECHAR</button>
-      <button class="modal-close" onclick="fecharModal('modalTenant')">✕</button>
-    </div>
+    <button class="modal-close" onclick="fecharModal('modalTenant')">✕</button>
   </div>
   <div class="modal-body">
     <input type="hidden" id="tId">
@@ -397,7 +388,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
       <div class="form-group"><label class="j-label">Status da Licença</label>
         <select class="j-select" id="tStatus"><option value="Online">Online (Ativo)</option><option value="Trial">Trial</option><option value="Bloqueado">Bloqueado</option></select>
       </div>
-      <div class="form-group"><label class="j-label">Importar conhecimento pronto (complementa)</label><input class="j-input" type="file" id="tBrainJsonFile" accept=".json,application/json" onchange="importarCerebroTenantArquivo(this)" title="Importa JSON gerado e mescla sem apagar o conhecimento atual."></div>
+      <div class="form-group"><label class="j-label">Gemini API Key Própria (opcional)</label><input class="j-input" id="tGemini" placeholder="AIzaSy... (deixe vazio para usar a global)"></div>
     </div>
     <div class="form-row c2">
       <div class="form-group"><label class="j-label">Cloudinary Cloud Name</label><input class="j-input" id="tCloudName" placeholder="dmuvm1o6m"></div>
@@ -421,18 +412,6 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
       <div class="form-group"><label class="j-label">Firebase messagingSenderId</label><input class="j-input" id="tFbMessagingSenderId" placeholder="123456789"></div>
       <div class="form-group"><label class="j-label">Firebase appId</label><input class="j-input" id="tFbAppId" placeholder="1:123456789:web:abcdef"></div>
     </div>
-    <div style="background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.22);border-radius:6px;padding:12px;margin:10px 0;">
-      <div style="font-family:var(--fm);font-size:0.72rem;color:var(--cyan);letter-spacing:1px;font-weight:800;margin-bottom:10px;">INTEGRAÇÃO VALORIA - COTAÇÃO POR ROBÔ</div>
-      <div class="form-row c2">
-        <label class="mod-check" style="margin:0;"><input type="checkbox" id="tValorIAAtivo"> Ativar ValorIA nesta oficina</label>
-      </div>
-      <div class="form-row c2">
-        <div class="form-group"><label class="j-label">Tenant no ValorIA</label><input class="j-input" id="tValorIATenantId" placeholder="tiao-motos"></div>
-        <div class="form-group"><label class="j-label">URL pública do fornecedor (Prec_IA)</label><input class="j-input" id="tValorIAPublicBaseUrl" placeholder="https://tsvalencio-ia.github.io/Prec_IA/fornecedor.html"></div>
-      </div>
-      <div class="form-group"><label class="j-label">Firebase Config do ValorIA (JSON)</label><textarea class="j-input" id="tValorIAFirebaseJson" rows="5" placeholder='{"apiKey":"...","authDomain":"...","databaseURL":"https://...firebaseio.com","projectId":"...","storageBucket":"...","messagingSenderId":"...","appId":"..."}' style="resize:vertical;min-height:112px;font-family:var(--fm);"></textarea></div>
-      <div style="font-family:var(--fm);font-size:0.62rem;color:var(--muted2);line-height:1.45;">Quando ativo, o Jarvis salva a cotação normal na O.S. e também coloca os fornecedores na fila do robô ValorIA. Sem ativar aqui, nada é enviado ao ValorIA.</div>
-    </div>
     <div style="background:rgba(139,92,246,0.07);border:1px solid rgba(139,92,246,0.25);border-radius:6px;padding:12px;margin:10px 0;">
       <div style="font-family:var(--fm);font-size:0.72rem;color:var(--purple);letter-spacing:1px;font-weight:800;margin-bottom:10px;">CEREBRO thIAguinho DA OFICINA</div>
       <div class="form-row c2">
@@ -444,11 +423,6 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
         <div class="form-group"><label class="j-label">Regras internas de resposta</label><textarea class="j-input" id="tBrainRegras" rows="4" placeholder="Como responder cliente/equipe/Jarvis, garantias, padroes de compra..." style="resize:vertical;min-height:96px;"></textarea></div>
       </div>
       <div class="form-group"><label class="j-label">Procedimentos tecnicos</label><textarea class="j-input" id="tBrainProcedimentos" rows="3" placeholder="Procedimentos e checklists internos usados pela oficina..." style="resize:vertical;min-height:80px;"></textarea></div>
-      <div class="form-group"><label class="j-label">JSON completo do cérebro privado</label><textarea class="j-input" id="tBrainJsonRaw" rows="5" placeholder='{"versao":1,"escopo":"tenant","comportamento":{"tom":"direto","permitirPiadas":false},"conhecimento":[]}' style="resize:vertical;min-height:110px;font-family:var(--fm);"></textarea></div>
-      <div class="form-row c2">
-        <button class="btn-ghost" type="button" onclick="gerarModeloCerebroTenant()">GERAR MODELO JSON</button>
-        <button class="btn-ghost" type="button" onclick="validarCerebroTenant()">VALIDAR JSON DO TENANT</button>
-      </div>
       <div style="font-family:var(--fm);font-size:0.62rem;color:var(--muted2);line-height:1.45;">O sistema usa estes campos em respostas locais e na IA, sem misturar dados entre oficinas.</div>
     </div>
     <div style="background:rgba(0,255,136,0.06);border:1px solid rgba(0,255,136,0.2);border-radius:6px;padding:12px;margin:10px 0;">
@@ -467,7 +441,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
         <label class="mod-check"><input type="checkbox" id="mCrm" value="crm"> 👥 CRM / Clientes</label>
         <label class="mod-check"><input type="checkbox" id="mEst" value="estoque"> 📦 Estoque</label>
         <label class="mod-check"><input type="checkbox" id="mFin" value="financeiro"> 💰 Financeiro / DRE</label>
-        <label class="mod-check"><input type="checkbox" id="mIA" value="ia"> 🤖 IA / Cérebro</label>
+        <label class="mod-check"><input type="checkbox" id="mIA" value="ia"> 🤖 IA / Gemini</label>
         <label class="mod-check"><input type="checkbox" id="mChat" value="chat"> 💬 Chat CRM</label>
         <label class="mod-check"><input type="checkbox" id="mAgd" value="agenda"> 📅 Agenda</label>
         <label class="mod-check"><input type="checkbox" id="mRH" value="rh"> 👷 Equipe / RH</label>
@@ -479,9 +453,9 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
         <label class="mod-check"><input type="checkbox" id="mComissaoVendas" value="comissaoVendas"> 💸 Comissão sobre vendas</label>
         <label class="mod-check"><input type="checkbox" id="mTabelaTempa" value="tabelaTempa" checked> 📖 Tabela Tempária SINDIREPA</label>
         <label class="mod-check"><input type="checkbox" id="mCilia" value="cilia" checked> 🔎 Pesquisa Cília API</label>
-        <label class="mod-check"><input type="checkbox" id="mOrcamentoAutomatizado" value="orcamentoAutomatizado" checked> Orcamento automatizado por regras</label>
         <label class="mod-check"><input type="checkbox" id="mCotacao" value="cotacao" checked> Cotacao de pecas / fornecedores</label>
         <label class="mod-check"><input type="checkbox" id="mClienteOficial" value="clienteOficial" checked> Cliente Oficial / orgao publico</label>
+        <label class="mod-check"><input type="checkbox" id="smClienteTempaOficial" checked> Fiscal pode consultar Tabela Temparia</label>
         <label class="mod-check"><input type="checkbox" id="mAssinatura" value="assinatura" checked> Assinatura digital</label>
         <label class="mod-check"><input type="checkbox" id="mPDF" value="pdf" checked> Exportar PDF</label>
         <label class="mod-check"><input type="checkbox" id="mXLSX" value="xlsx" checked> Exportar XLSX/PMSP</label>
@@ -497,8 +471,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
   </div>
   <div class="modal-foot">
     <button class="btn-ghost" onclick="fecharModal('modalTenant')">CANCELAR</button>
-    <button class="btn-success" onclick="salvarTenant({manterAberto:true})">SALVAR E CONTINUAR</button>
-    <button class="btn-primary" onclick="salvarTenant()">SALVAR E FECHAR</button>
+    <button class="btn-primary" onclick="salvarTenant()">SALVAR TENANT</button>
   </div>
 </div>
 </div>
@@ -539,7 +512,6 @@ const db=firebase.firestore();
 // Credenciais Firebase Auth (email real da conta)
 const MASTER_EMAIL = 'tsvalencio@gmail.com';
 const MASTER_UID   = 'H347zQ8bUccyjBeFzQQEJQdtDKy2';
-const PRECIA_PUBLIC_BASE_URL = 'https://tsvalencio-ia.github.io/Prec_IA/fornecedor.html';
 
 // Credenciais locais de emergência (quando Firebase Auth não está configurado)
 const MASTER_LOCAL = [
@@ -700,13 +672,13 @@ function renderDashboard(){
   // Tabela resumo
   $('dashTenants').innerHTML=allTenants.slice(0,8).map(t=>{
     const stCls=t.status==='Online'?'pill-green':t.status==='Trial'?'pill-warn':'pill-danger';
-    return `<tr><td><strong>${t.nomeFantasia||'-'}</strong></td><td><span class="pill pill-purple">${t.nicho||'-'}</span></td><td style="font-family:var(--fm);font-size:0.72rem;color:var(--cyan)">${t.usuario||'-'}</td><td><span class="pill ${stCls}">${t.status||'?'}</span></td><td style="font-family:var(--fm);font-size:0.72rem">${t.plano||'trial'}</td><td style="text-align:center"><span class="pill ${t.modulos?.ia!==false?'pill-green':'pill-danger'}">${t.modulos?.ia!==false?'Ativa':'Bloqueada'}</span></td></tr>`;
+    return `<tr><td><strong>${t.nomeFantasia||'-'}</strong></td><td><span class="pill pill-purple">${t.nicho||'-'}</span></td><td style="font-family:var(--fm);font-size:0.72rem;color:var(--cyan)">${t.usuario||'-'}</td><td><span class="pill ${stCls}">${t.status||'?'}</span></td><td style="font-family:var(--fm);font-size:0.72rem">${t.plano||'trial'}</td><td style="text-align:center">${t.apiKeys?.gemini?'✅':'❌'}</td></tr>`;
   }).join('')||'<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--muted);font-family:var(--fm);font-size:0.75rem">Nenhum tenant cadastrado</td></tr>';
 }
 
 function renderTenants(filter=''){
   const list=filter?allTenants.filter(t=>(t.nomeFantasia||'').toLowerCase().includes(filter.toLowerCase())):allTenants;
-  const mods_map={os:'O.S.',crm:'CRM',estoque:'Est.',financeiro:'Fin.',ia:'IA',chat:'Chat',agenda:'Agd.',rh:'RH',comissoes:'Comiss.',autoPecas:'Autopeças',vendaTerceiros:'Terceiros',varejo:'Varejo',atacado:'Atacado',comissaoVendas:'Com.Vendas',tabelaTempa:'Tempa',orcamentoAutomatizado:'Orc.Auto'};
+  const mods_map={os:'O.S.',crm:'CRM',estoque:'Est.',financeiro:'Fin.',ia:'IA',chat:'Chat',agenda:'Agd.',rh:'RH',comissoes:'Comiss.',autoPecas:'Autopeças',vendaTerceiros:'Terceiros',varejo:'Varejo',atacado:'Atacado',comissaoVendas:'Com.Vendas',tabelaTempa:'Tempa'};
   $('tbTenants').innerHTML=list.map(t=>{
     const stCls=t.status==='Online'?'pill-green':t.status==='Trial'?'pill-warn':'pill-danger';
     const mods=Object.entries(t.modulos||{}).filter(([,v])=>v).map(([k])=>`<span class="pill pill-purple" style="font-size:0.5rem;padding:1px 6px">${mods_map[k]||k}</span>`).join(' ');
@@ -756,39 +728,6 @@ function montarFirebaseOficina(){
   return Object.values(cfg).some(Boolean) ? cfg : null;
 }
 
-function montarValorIAFirebaseConfig(){
-  const raw=$v('tValorIAFirebaseJson').trim();
-  if(!raw) return null;
-  try{
-    const parsed=JSON.parse(raw);
-    return parsed.firebaseConfig || parsed.config || parsed;
-  }catch(e){
-    throw new Error('JSON do Firebase ValorIA invalido: '+(e.message||e));
-  }
-}
-
-function montarValorIAConfig(){
-  const ativo=!!$('tValorIAAtivo')?.checked;
-  let fb=null;
-  try{fb=montarValorIAFirebaseConfig();}catch(e){throw e;}
-  const tenantValorIA=$v('tValorIATenantId')||(normalizarSlugTenant($v('tPublicSlug'),$v('tNome'))||$v('tId'));
-  const emailsValorIA=normalizarEmailsAdminTenant($v('tAdminEmails')).emails;
-  const cfg={
-    ativo,
-    enabled:ativo,
-    tenantId:tenantValorIA,
-    tenantOnly:true,
-    publicBaseUrl:$v('tValorIAPublicBaseUrl')||PRECIA_PUBLIC_BASE_URL,
-    adminEmails:emailsValorIA,
-    adminEmail:emailsValorIA[0]||'',
-    firebaseConfig:fb,
-    atualizadoEm:new Date().toISOString()
-  };
-  if(ativo && (!fb || !fb.databaseURL)) throw new Error('ValorIA ativo exige firebaseConfig com databaseURL.');
-  if(ativo && !cfg.tenantId) throw new Error('ValorIA ativo exige tenantId do ValorIA.');
-  return ativo || fb || cfg.publicBaseUrl || cfg.tenantId ? cfg : null;
-}
-
 function normalizarEmailsAdminTenant(raw){
   const invalidos=[];
   const emails=[...new Set(String(raw||'')
@@ -816,15 +755,13 @@ function normalizarSlugTenant(raw,nome){
 }
 
 function prepTenant(mode,id=null){
-  ['tId','tNome','tUser','tSenha','tAdminEmails','tWpp','tCloudName','tCloudPreset','tLogoFile','tAssinaturaFile','tBrainJsonFile','tBrainJsonRaw','tValorIATenantId','tValorIAPublicBaseUrl','tValorIAFirebaseJson',...CAMPOS_DADOS_OFICINA,...CAMPOS_FIREBASE_OFICINA].forEach(f=>{if($(f))$(f).value='';});
-  ['tValorIAAtivo'].forEach(f=>{if($(f))$(f).checked=false;});
-  ['mOS','mCrm','mEst','mFin','mIA','mChat','mAgd','mRH','mComissoes','mAutoPecas','mVendaTerceiros','mVarejo','mAtacado','mComissaoVendas','mTabelaTempa','mCilia','mOrcamentoAutomatizado','mCotacao','mClienteOficial','mAssinatura','mPDF','mXLSX','mAuditoria','mRelatorios','mExportacoes','mWhatsappBot'].forEach(f=>{if($(f))$(f).checked=false;});
+  ['tId','tNome','tUser','tSenha','tAdminEmails','tWpp','tGemini','tCloudName','tCloudPreset','tLogoFile','tAssinaturaFile',...CAMPOS_DADOS_OFICINA,...CAMPOS_FIREBASE_OFICINA].forEach(f=>{if($(f))$(f).value='';});
+  ['mOS','mCrm','mEst','mFin','mIA','mChat','mAgd','mRH','mComissoes','mAutoPecas','mVendaTerceiros','mVarejo','mAtacado','mComissaoVendas','mTabelaTempa','mCilia','mCotacao','mClienteOficial','smClienteTempaOficial','mAssinatura','mPDF','mXLSX','mAuditoria','mRelatorios','mExportacoes','mWhatsappBot'].forEach(f=>{if($(f))$(f).checked=false;});
   $('tStatus').value='Online'; $('tNicho').value='carros'; $('tPlano').value='trial';
   $('tCloudName').value='dmuvm1o6m'; $('tCloudPreset').value='evolution';
-  if($('tValorIAPublicBaseUrl')) $('tValorIAPublicBaseUrl').value=PRECIA_PUBLIC_BASE_URL;
   $('modalTenantTitle').innerText='NOVA OFICINA (TENANT)';
   // Habilita módulos padrão
-  ['mOS','mCrm','mEst','mFin','mAutoPecas','mVendaTerceiros','mVarejo','mComissaoVendas','mTabelaTempa','mCilia','mOrcamentoAutomatizado','mCotacao','mClienteOficial','mAssinatura','mPDF','mXLSX','mAuditoria','mRelatorios','mExportacoes'].forEach(f=>{if($(f))$(f).checked=true;});
+  ['mOS','mCrm','mEst','mFin','mAutoPecas','mVendaTerceiros','mVarejo','mComissaoVendas','mTabelaTempa','mCilia','mCotacao','mClienteOficial','smClienteTempaOficial','mAssinatura','mPDF','mXLSX','mAuditoria','mRelatorios','mExportacoes'].forEach(f=>{if($(f))$(f).checked=true;});
   if(mode==='edit'&&id){
     const t=allTenants.find(x=>x.id===id); if(!t) return;
     $('tId').value=t.id; $('tNome').value=t.nomeFantasia||''; $('tUser').value=t.usuario||'';
@@ -852,7 +789,7 @@ function prepTenant(mode,id=null){
     if($('tAssinaturaCargo')) $('tAssinaturaCargo').value=ass.cargo||ass.funcao||'Responsável técnico';
     if($('tAssinaturaDocumento')) $('tAssinaturaDocumento').value=ass.documento||ass.cpfCnpj||'';
     if($('tAssinaturaUrl')) $('tAssinaturaUrl').value=ass.url||ass.assinaturaUrl||ass.imagemUrl||'';
-    $('tCloudName').value=t.apiKeys?.cloudName||'dmuvm1o6m';
+    $('tGemini').value=t.apiKeys?.gemini||''; $('tCloudName').value=t.apiKeys?.cloudName||'dmuvm1o6m';
     $('tCloudPreset').value=t.apiKeys?.cloudPreset||'evolution';
     const fb=t.firebaseConfig||{};
     $('tFbApiKey').value=fb.apiKey||'';
@@ -861,22 +798,12 @@ function prepTenant(mode,id=null){
     $('tFbStorageBucket').value=fb.storageBucket||'';
     $('tFbMessagingSenderId').value=fb.messagingSenderId||'';
     $('tFbAppId').value=fb.appId||'';
-    const valoria=t.valorIA||t.valoria||t.valoriaIntegracao||t.valorIAIntegracao||{};
-    if($('tValorIAAtivo')) $('tValorIAAtivo').checked=!!(valoria.ativo||valoria.enabled||valoria.integrado||String(valoria.status||'').toLowerCase()==='ativo');
-    if($('tValorIATenantId')){
-      const valorTenant=valoria.tenantId||valoria.tenant||valoria.valoriaTenantId||'';
-      const tenantAntigo=['legacy','root'].join('_');
-      $('tValorIATenantId').value=String(valorTenant)===tenantAntigo?(t.slug||t.publicSlug||t.oficinaSlug||normalizarSlugTenant('',t.nomeFantasia||t.nome||t.id)||t.id):valorTenant;
-    }
-    if($('tValorIAPublicBaseUrl')) $('tValorIAPublicBaseUrl').value=valoria.publicBaseUrl||valoria.baseUrl||valoria.fornecedorUrl||valoria.urlFornecedor||PRECIA_PUBLIC_BASE_URL;
-    if($('tValorIAFirebaseJson')) $('tValorIAFirebaseJson').value=valoria.firebaseConfig?JSON.stringify(valoria.firebaseConfig,null,2):'';
     const brain=t.brain||t.cerebro||t.thiaguinhoBrain||{};
     if($('tBrainContexto')) $('tBrainContexto').value=brain.contexto||'';
     if($('tBrainCatalogos')) $('tBrainCatalogos').value=brain.catalogos||'';
     if($('tBrainErros')) $('tBrainErros').value=brain.erros||'';
     if($('tBrainRegras')) $('tBrainRegras').value=brain.regras||'';
     if($('tBrainProcedimentos')) $('tBrainProcedimentos').value=brain.procedimentos||'';
-    if($('tBrainJsonRaw')) $('tBrainJsonRaw').value=JSON.stringify(brain && Object.keys(brain).length ? brain : {versao:1,escopo:'tenant',comportamento:{tom:'direto',permitirPiadas:false},conhecimento:[],regras:[],procedimentos:[],diagnosticos:[]}, null, 2);
     const tpl=t.templates||t.modelosDocumentos||{};
     if($('tTplPdfOrcamento')) $('tTplPdfOrcamento').value=tpl.pdfOrcamento||'';
     if($('tTplPdfLaudo')) $('tTplPdfLaudo').value=tpl.pdfLaudo||'';
@@ -894,9 +821,9 @@ function prepTenant(mode,id=null){
     if($('mComissaoVendas')) $('mComissaoVendas').checked=m.comissaoVendas !== false && (!!m.autoPecas || !!m.estoque);
     if($('mTabelaTempa')) $('mTabelaTempa').checked=m.tabelaTempa !== false; // default ligado
     if($('mCilia')) $('mCilia').checked=m.cilia !== false; // default ligado
-    if($('mOrcamentoAutomatizado')) $('mOrcamentoAutomatizado').checked=m.orcamentoAutomatizado !== false;
     if($('mCotacao')) $('mCotacao').checked=m.cotacao !== false;
     if($('mClienteOficial')) $('mClienteOficial').checked=m.clienteOficial !== false;
+    if($('smClienteTempaOficial')) $('smClienteTempaOficial').checked=(t.submodulos?.cliente?.tabelaTempaOficial !== false);
     if($('mAssinatura')) $('mAssinatura').checked=m.assinatura !== false;
     if($('mPDF')) $('mPDF').checked=m.pdf !== false;
     if($('mXLSX')) $('mXLSX').checked=m.xlsx !== false;
@@ -970,7 +897,6 @@ function montarSubmodulosComerciais(){
     comissaoVendas:$('mComissaoVendas')?$('mComissaoVendas').checked:false,
     tabelaTempa:$('mTabelaTempa')?$('mTabelaTempa').checked:true,
     cilia:$('mCilia')?$('mCilia').checked:true,
-    orcamentoAutomatizado:$('mOrcamentoAutomatizado')?$('mOrcamentoAutomatizado').checked:true,
     cotacao:$('mCotacao')?$('mCotacao').checked:true,
     clienteOficial:$('mClienteOficial')?$('mClienteOficial').checked:true,
     assinatura:$('mAssinatura')?$('mAssinatura').checked:true,
@@ -979,18 +905,17 @@ function montarSubmodulosComerciais(){
     auditoria:$('mAuditoria')?$('mAuditoria').checked:true,
     relatorios:$('mRelatorios')?$('mRelatorios').checked:true,
     exportacoes:$('mExportacoes')?$('mExportacoes').checked:true,
-    whatsappBot:$('mWhatsappBot')?$('mWhatsappBot').checked:false,
-    valorIA:$('tValorIAAtivo')?$('tValorIAAtivo').checked:false
+    whatsappBot:$('mWhatsappBot')?$('mWhatsappBot').checked:false
   };
   return {
-    os:{criar:mod.os, editar:mod.os, aprovar:mod.os, salvarContinuar:mod.os, pdf:mod.os&&mod.pdf, xlsx:mod.os&&mod.xlsx, assinatura:mod.os&&mod.assinatura, guincho:mod.os, temparia:mod.os&&mod.tabelaTempa, orcamentoAutomatizado:mod.os&&mod.orcamentoAutomatizado, execucaoEquipe:mod.os&&mod.rh, auditoria:mod.os&&mod.auditoria, cotacao:mod.os&&mod.cotacao},
+    os:{criar:mod.os, editar:mod.os, aprovar:mod.os, salvarContinuar:mod.os, pdf:mod.os&&mod.pdf, xlsx:mod.os&&mod.xlsx, assinatura:mod.os&&mod.assinatura, guincho:mod.os, temparia:mod.os&&mod.tabelaTempa, execucaoEquipe:mod.os&&mod.rh, auditoria:mod.os&&mod.auditoria, cotacao:mod.os&&mod.cotacao},
     financeiro:{receitas:mod.financeiro, despesas:mod.financeiro, boletos:mod.financeiro, dre:mod.financeiro, contasPagar:mod.financeiro, contasReceber:mod.financeiro, boletosNF:mod.financeiro, financeiroPorOS:mod.financeiro&&mod.os, receitasBalcao:mod.financeiro&&mod.autoPecas, comissoesVendas:mod.financeiro&&mod.comissaoVendas},
     nfXml:{entradaXml:mod.estoque, entradaManual:mod.estoque, fornecedores:mod.estoque, vincularOS:mod.estoque&&mod.os, estoque:mod.estoque, devolucao:mod.estoque, garantia:mod.estoque, financeiroNF:mod.estoque&&mod.financeiro},
     autoPecas:{balcao:mod.autoPecas, terceiros:mod.autoPecas&&mod.vendaTerceiros, varejo:mod.autoPecas&&mod.varejo, atacado:mod.autoPecas&&mod.atacado, baixaEstoque:mod.autoPecas&&mod.estoque, financeiro:mod.autoPecas&&mod.financeiro, comissaoVendas:mod.autoPecas&&mod.comissaoVendas},
     ia:{jarvis:mod.ia, equipe:mod.ia&&mod.rh, superadmin:mod.ia, cliente:mod.ia&&mod.crm},
-    cliente:{portalCliente:mod.crm, clienteOficial:mod.crm&&mod.os&&mod.clienteOficial, mensagens:mod.crm&&mod.chat, aprovacaoOnline:mod.crm&&mod.os, documentos:mod.crm&&mod.os},
+    cliente:{portalCliente:mod.crm, clienteOficial:mod.crm&&mod.os&&mod.clienteOficial, tabelaTempaOficial:mod.crm&&mod.os&&mod.clienteOficial&&mod.tabelaTempa&&($('smClienteTempaOficial') ? $('smClienteTempaOficial').checked : true), mensagens:mod.crm&&mod.chat, aprovacaoOnline:mod.crm&&mod.os, documentos:mod.crm&&mod.os},
     documentos:{pdf:mod.pdf&&mod.os, xlsx:mod.xlsx&&mod.os, templates:mod.templates!==false, assinatura:mod.assinatura&&mod.os},
-    integracoes:{cilia:mod.cilia, tabelaTempa:mod.tabelaTempa, orcamentoAutomatizado:mod.orcamentoAutomatizado&&mod.os, cotacao:mod.cotacao, valorIA:mod.valorIA&&mod.cotacao, whatsappBot:mod.whatsappBot&&mod.chat, pwa:true, apk:true, exe:true}
+    integracoes:{cilia:mod.cilia, tabelaTempa:mod.tabelaTempa, cotacao:mod.cotacao, whatsappBot:mod.whatsappBot&&mod.chat, pwa:true, apk:true, exe:true}
   };
 }
 
@@ -1000,13 +925,12 @@ function avisosDependenciasModulos(){
   if($('mEst')?.checked && !$('mFin')?.checked) avisos.push('NF/XML sem Financeiro não gera contas a pagar.');
   if($('mRH')?.checked && !$('mOS')?.checked) avisos.push('Equipe depende de O.S. para execução.');
   if($('mTabelaTempa')?.checked && !$('mOS')?.checked) avisos.push('Tempária depende de O.S. para aplicar TMO.');
-  if($('mOrcamentoAutomatizado')?.checked && !$('mOS')?.checked) avisos.push('Orcamento automatizado depende de O.S.');
   if($('mAutoPecas')?.checked && !$('mEst')?.checked) avisos.push('Autopeças precisa de Estoque para baixa e margem por item.');
   if($('mAutoPecas')?.checked && !$('mFin')?.checked) avisos.push('Autopeças sem Financeiro registra venda, mas não gera caixa/contas a receber.');
   if($('mComissaoVendas')?.checked && !$('mAutoPecas')?.checked) avisos.push('Comissão de vendas depende do módulo Autopeças/Balcão.');
   if($('mCotacao')?.checked && (!$('mOS')?.checked || !$('mEst')?.checked)) avisos.push('Cotacao de pecas depende de O.S. e Estoque/Fornecedores.');
-  if($('tValorIAAtivo')?.checked && !$('mCotacao')?.checked) avisos.push('ValorIA depende do modulo Cotacao de pecas / fornecedores.');
   if($('mClienteOficial')?.checked && (!$('mOS')?.checked || !$('mCrm')?.checked)) avisos.push('Cliente Oficial depende de O.S. e CRM/Clientes.');
+  if($('smClienteTempaOficial')?.checked && (!$('mClienteOficial')?.checked || !$('mTabelaTempa')?.checked)) avisos.push('Consulta Tempária do fiscal depende de Cliente Oficial e Tabela Tempária.');
   if($('mPDF')?.checked && !$('mOS')?.checked) avisos.push('PDF depende de O.S.');
   if($('mXLSX')?.checked && !$('mOS')?.checked) avisos.push('XLSX/PMSP depende de O.S.');
   if($('mAssinatura')?.checked && !$('mOS')?.checked) avisos.push('Assinatura digital depende de O.S.');
@@ -1014,36 +938,9 @@ function avisosDependenciasModulos(){
   return avisos;
 }
 
-function montarCerebroTenantPayload(){
-  const base={
-    versao:1,
-    escopo:'tenant',
-    comportamento:{tom:'direto',permitirPiadas:false},
-    contexto:$v('tBrainContexto'),
-    catalogos:$v('tBrainCatalogos'),
-    erros:$v('tBrainErros'),
-    regras:$v('tBrainRegras') ? [$v('tBrainRegras')] : [],
-    procedimentos:$v('tBrainProcedimentos') ? [$v('tBrainProcedimentos')] : [],
-    diagnosticos:[],
-    conhecimento:[],
-    atualizadoEm:new Date().toISOString()
-  };
-  const raw=$v('tBrainJsonRaw').trim();
-  if(!raw) return base;
-  try{
-    const normalizar=window.thiaNormalizeBrainJson || (txt=>JSON.parse(txt));
-    const parsed=normalizar(raw,{escopo:'tenant'});
-    return {...base,...parsed,escopo:'tenant',atualizadoEm:new Date().toISOString()};
-  }catch(e){
-    throw new Error('JSON do cerebro do tenant invalido: '+(e.message||e));
-  }
-}
-
-async function salvarTenant(opcoes={}){
-  const manterAberto=!!opcoes.manterAberto;
-  let cerebroTenant;
-  try{cerebroTenant=montarCerebroTenantPayload();}catch(e){toast(e.message||e,'err');return;}
+async function salvarTenant(){
   if(!$v('tNome')||!$v('tUser')||!$v('tSenha')){toast('⚠ Preencha nome, usuário e senha','warn');return;}
+  const geminiKey=$v('tGemini');
   const firebaseConfig=montarFirebaseOficina();
   const adminEmailsParsed=normalizarEmailsAdminTenant($v('tAdminEmails'));
   if(adminEmailsParsed.invalidos.length){
@@ -1051,8 +948,6 @@ async function salvarTenant(opcoes={}){
     return;
   }
   const slugPublico=normalizarSlugTenant($v('tPublicSlug'),$v('tNome'));
-  let valorIAConfig=null;
-  try{valorIAConfig=montarValorIAConfig();}catch(e){toast(e.message||e,'err');return;}
   const id=$v('tId');
   if(slugPublico){
     try{
@@ -1109,14 +1004,11 @@ async function salvarTenant(opcoes={}){
     },
     enderecoCompleto:montarEnderecoOficina(),
     apiKeys:{
+      gemini:geminiKey||await buscarKeyGlobal(),
       cloudName:$v('tCloudName')||'dmuvm1o6m',
       cloudPreset:$v('tCloudPreset')||'evolution'
     },
     firebaseConfig,
-    valorIA:valorIAConfig,
-    valoria:valorIAConfig,
-    valoriaIntegracao:valorIAConfig,
-    valorIAIntegracao:valorIAConfig,
     brain:{
       contexto:$v('tBrainContexto'),
       catalogos:$v('tBrainCatalogos'),
@@ -1152,7 +1044,6 @@ async function salvarTenant(opcoes={}){
       comissaoVendas:$('mComissaoVendas')?$('mComissaoVendas').checked:false,
       tabelaTempa:$('mTabelaTempa')?$('mTabelaTempa').checked:true,  // default true
       cilia:$('mCilia')?$('mCilia').checked:true,
-      orcamentoAutomatizado:$('mOrcamentoAutomatizado')?$('mOrcamentoAutomatizado').checked:true,
       cotacao:$('mCotacao')?$('mCotacao').checked:true,
       clienteOficial:$('mClienteOficial')?$('mClienteOficial').checked:true,
       assinatura:$('mAssinatura')?$('mAssinatura').checked:true,
@@ -1161,38 +1052,25 @@ async function salvarTenant(opcoes={}){
       auditoria:$('mAuditoria')?$('mAuditoria').checked:true,
       relatorios:$('mRelatorios')?$('mRelatorios').checked:true,
       exportacoes:$('mExportacoes')?$('mExportacoes').checked:true,
-      whatsappBot:$('mWhatsappBot')?$('mWhatsappBot').checked:false,
-      valorIA:!!valorIAConfig?.ativo
+      whatsappBot:$('mWhatsappBot')?$('mWhatsappBot').checked:false
     },
     submodulos:montarSubmodulosComerciais(),
     dependenciasModulosAvisos:avisosDependenciasModulos(),
     updatedAt:new Date().toISOString()
   };
-  payload.brain=cerebroTenant;
-  payload.cerebro=cerebroTenant;
-  payload.thiaguinhoBrain=cerebroTenant;
   try{
-    let idSalvo=id;
     if(id){
       await db.collection('oficinas').doc(id).update(payload);
       // Sincroniza em tenants também
       try{await db.collection('tenants').doc(id).update(payload);}catch(e){}
-      toast(manterAberto?'✓ TENANT SALVO. CONTINUE EDITANDO.':'✓ TENANT ATUALIZADO');
+      toast('✓ TENANT ATUALIZADO');
     }else{
       payload.criadoEm=new Date().toISOString();
       const ref=await db.collection('oficinas').add(payload);
-      idSalvo=ref.id;
       await db.collection('tenants').doc(ref.id).set({...payload,oficinasId:ref.id});
       toast('✓ NOVA OFICINA IMPLANTADA! ID: '+ref.id.slice(-6).toUpperCase());
     }
-    if(manterAberto){
-      if(idSalvo){
-        $('tId').value=idSalvo;
-        $('modalTenantTitle').innerText='EDITAR TENANT: '+($v('tNome')||'').toUpperCase();
-      }
-    }else{
-      fecharModal('modalTenant');
-    }
+    fecharModal('modalTenant');
   }catch(e){toast('✕ ERRO: '+e.message,'err');}
 }
 
@@ -1210,18 +1088,23 @@ async function toggleStatus(id,status){
   toast(`✓ STATUS → ${novo}`);
 }
 
-// IA LOCAL / CEREBRO JSON
+// IA CONFIG
 async function carregarConfigIA(){
   try{
     const res=await fetch('https://thiaguinho-40a14-default-rtdb.firebaseio.com/admin_config.json');
     const cfg=await res.json();
+    if(cfg?.gemini_api_key) $('iaGeminiKey').value=cfg.gemini_api_key;
     if(cfg?.cloudinary_name) $('iaCloudName').value=cfg.cloudinary_name;
     if(cfg?.cloudinary_preset) $('iaCloudPreset').value=cfg.cloudinary_preset;
   }catch(e){}
+}
+
+async function buscarKeyGlobal(){
   try{
-    const doc=await db.collection('cerebros_ia').doc('global').get();
-    if(doc.exists && $('iaBrainGlobalJson')) $('iaBrainGlobalJson').value=JSON.stringify(doc.data(),null,2);
-  }catch(e){}
+    const res=await fetch('https://thiaguinho-40a14-default-rtdb.firebaseio.com/admin_config/gemini_api_key.json');
+    const key=await res.json();
+    return key||'';
+  }catch(e){return '';}
 }
 
 function escSA(v){
@@ -1231,179 +1114,89 @@ function escSA(v){
 function montarContextoSuperadminIA(){
   const ativos=allTenants.filter(t=>t.status==='Online').length;
   const bloqueados=allTenants.filter(t=>t.status==='Bloqueado').length;
+  const semGemini=allTenants.filter(t=>!t.apiKeys?.gemini).length;
   const modCount=nome=>allTenants.filter(t=>t.modulos?.[nome]!==false).length;
   return [
     `Tenants carregados: ${allTenants.length}`,
-    `Online: ${ativos}; Bloqueados: ${bloqueados}`,
+    `Online: ${ativos}; Bloqueados: ${bloqueados}; Sem chave Gemini propria/global: ${semGemini}`,
     `Modulos habilitados - OS:${modCount('os')} Financeiro:${modCount('financeiro')} Estoque:${modCount('estoque')} IA:${modCount('ia')} Chat:${modCount('chat')}`,
     `Auditoria carregada: ${allAudit.length} evento(s). Financeiro SaaS carregado: ${allSaasFin.length} lancamento(s).`,
     `Tenants recentes: ${allTenants.slice(0,20).map(t=>`${t.nomeFantasia||t.id} status ${t.status||'N/I'} plano ${t.plano||'N/I'} modulos ${Object.entries(t.modulos||{}).filter(([,v])=>v!==false).map(([k])=>k).join('/')||'N/I'}`).join(' | ')}`
   ].join('\n');
 }
 
-function respostaLocalSuperadminIA(prompt){
+function respostaLocalSuperadminIA(prompt, erro){
   const ctx=montarContextoSuperadminIA();
-  const resp=typeof window.thiaResponderLocal==='function'
-    ? window.thiaResponderLocal(prompt,{perfil:'superadmin'})
-    : null;
-  return `<b>Resposta local do Superadmin</b><br><br>${resp||escSA(ctx).replace(/\n/g,'<br>')}<br><br><b>Regra:</b> resposta baseada somente nos dados carregados e no cérebro JSON salvo.`;
-}
-
-function normalizarCerebroAdmin(raw,escopo){
-  const normalizar=window.thiaNormalizeBrainJson || (txt=>JSON.parse(typeof txt==='string'?txt:JSON.stringify(txt)));
-  const data=normalizar(raw,{escopo:escopo||'global'});
-  data.escopo=escopo||data.escopo||'global';
-  data.atualizadoEm=new Date().toISOString();
-  return data;
-}
-
-function chaveConhecimento(v){
-  const txt=typeof v==='string'?v:(v?.texto||v?.descricao||v?.titulo||JSON.stringify(v||{}));
-  return String(txt||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\s+/g,' ').trim();
-}
-function asArrayConhecimento(v){
-  if(!v) return [];
-  if(Array.isArray(v)) return v;
-  if(typeof v==='string') return v.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-  if(typeof v==='object') return Object.values(v);
-  return [];
-}
-function mergeArraySemSobrescrever(base, add){
-  const out=asArrayConhecimento(base).slice();
-  const seen=new Set(out.map(chaveConhecimento).filter(Boolean));
-  asArrayConhecimento(add).forEach(item=>{
-    const k=chaveConhecimento(item);
-    if(!k||seen.has(k)) return;
-    seen.add(k);
-    out.push(item);
-  });
-  return out;
-}
-function juntarTextoCampo(base, add, titulo){
-  const b=String(base||'').trim();
-  const a=String(add||'').trim();
-  if(!a) return b;
-  if(b && b.includes(a.slice(0,160))) return b;
-  const bloco='--- IMPORTADO: '+titulo+' ---\n'+a;
-  return [b,bloco].filter(Boolean).join('\n\n');
-}
-function detectarConflitosConhecimento(base, add){
-  const linhasBase=asArrayConhecimento(base?.conhecimento).map(chaveConhecimento);
-  const linhasAdd=asArrayConhecimento(add?.conhecimento);
-  const conflitos=[];
-  linhasAdd.forEach(item=>{
-    const txt=typeof item==='string'?item:(item?.texto||item?.descricao||item?.titulo||'');
-    const code=String(txt).match(/\b[A-Z0-9][A-Z0-9.\-\/]{4,}\b/);
-    if(!code) return;
-    const c=code[0].toLowerCase();
-    const old=linhasBase.find(x=>x.includes(c));
-    const novo=chaveConhecimento(txt);
-    if(old&&old!==novo){
-      conflitos.push({codigo:code[0], existente:old.slice(0,240), novo:String(txt).slice(0,240), status:'pendente', criadoEm:new Date().toISOString()});
-    }
-  });
-  return conflitos.slice(0,50);
-}
-function perguntarConflitos(conflitos){
-  const resolvidas=[];
-  const pendentes=[];
-  conflitos.slice(0,8).forEach(c=>{
-    const resp=prompt('Divergência encontrada para '+c.codigo+'.\n\nExistente: '+c.existente+'\n\nNovo: '+c.novo+'\n\nDigite a decisão correta para salvar no cérebro, ou deixe vazio para marcar pendente.');
-    if(resp&&resp.trim()) resolvidas.push({...c,resposta:resp.trim(),status:'resolvida',respondidoPor:'superadmin',respondidoEm:new Date().toISOString()});
-    else pendentes.push(c);
-  });
-  return {resolvidas,pendentes:pendentes.concat(conflitos.slice(8))};
-}
-function mesclarCerebroSemSobrescrever(baseRaw, importadoRaw, escopo){
-  const base=normalizarCerebroAdmin(baseRaw||{},escopo);
-  const add=normalizarCerebroAdmin(importadoRaw||{},escopo);
-  const conflitos=detectarConflitosConhecimento(base,add);
-  const respostas=conflitos.length?perguntarConflitos(conflitos):{resolvidas:[],pendentes:[]};
-  const fonteTitulo=(add.fontes?.[0]?.nome||add.fonte?.nome||'conhecimento importado');
-  const merged={
-    ...base,
-    escopo:escopo||base.escopo||add.escopo,
-    comportamento:base.comportamento||add.comportamento||{tom:'direto',permitirPiadas:false},
-    contexto:juntarTextoCampo(base.contexto,add.contexto,fonteTitulo),
-    catalogos:juntarTextoCampo(base.catalogos,add.catalogos,fonteTitulo),
-    erros:juntarTextoCampo(base.erros,add.erros,fonteTitulo),
-    regras:mergeArraySemSobrescrever(base.regras,add.regras),
-    procedimentos:mergeArraySemSobrescrever(base.procedimentos,add.procedimentos),
-    diagnosticos:mergeArraySemSobrescrever(base.diagnosticos,add.diagnosticos),
-    conhecimento:mergeArraySemSobrescrever(base.conhecimento,add.conhecimento),
-    fontes:mergeArraySemSobrescrever(base.fontes,add.fontes||add.fonte),
-    conflitosConhecimento:mergeArraySemSobrescrever(base.conflitosConhecimento,respostas.pendentes),
-    pendenciasConhecimento:mergeArraySemSobrescrever(base.pendenciasConhecimento||base.pendencias,respostas.pendentes.concat(add.pendenciasConhecimento||[])),
-    duvidasResolvidas:mergeArraySemSobrescrever(base.duvidasResolvidas,respostas.resolvidas),
-    atualizadoEm:new Date().toISOString()
-  };
-  if(respostas.resolvidas.length){
-    merged.conhecimento=mergeArraySemSobrescrever(merged.conhecimento,respostas.resolvidas.map(r=>({titulo:'Decisão Superadmin '+r.codigo,texto:r.resposta,origem:'resolucao_divergencia',codigo:r.codigo,atualizadoEm:r.respondidoEm})));
-  }
-  return {merged,conflitos:conflitos.length,resolvidas:respostas.resolvidas.length,pendentes:respostas.pendentes.length};
-}
-
-function gerarModeloCerebroGlobal(){
-  $('iaBrainGlobalJson').value=(window.thiaGerarModeloCerebroJSON?window.thiaGerarModeloCerebroJSON('global'):JSON.stringify({versao:1,escopo:'global',comportamento:{tom:'direto',permitirPiadas:false},conhecimento:[],regras:[],procedimentos:[],diagnosticos:[]},null,2));
-}
-function gerarModeloCerebroTenant(){
-  $('tBrainJsonRaw').value=(window.thiaGerarModeloCerebroJSON?window.thiaGerarModeloCerebroJSON('tenant'):JSON.stringify({versao:1,escopo:'tenant',comportamento:{tom:'direto',permitirPiadas:false},conhecimento:[],regras:[],procedimentos:[],diagnosticos:[]},null,2));
-}
-async function importarCerebroGlobalArquivo(input){
-  const file=input?.files?.[0]; if(!file) return;
-  try{
-    const raw=await file.text();
-    const atual=$v('iaBrainGlobalJson')||'{}';
-    const res=mesclarCerebroSemSobrescrever(atual,raw,'global');
-    $('iaBrainGlobalJson').value=JSON.stringify(res.merged,null,2);
-    toast(`Conhecimento global importado sem sobrescrever. Novas divergências: ${res.pendentes}. Resolvidas agora: ${res.resolvidas}.`,'ok');
-  }catch(e){toast('Erro ao importar JSON: '+(e.message||e),'err');}
-}
-async function importarCerebroTenantArquivo(input){
-  const file=input?.files?.[0]; if(!file) return;
-  try{
-    const raw=await file.text();
-    const atual=$v('tBrainJsonRaw')||'{}';
-    const res=mesclarCerebroSemSobrescrever(atual,raw,'tenant');
-    $('tBrainJsonRaw').value=JSON.stringify(res.merged,null,2);
-    validarCerebroTenant();
-    toast(`Conhecimento da oficina complementado. Pendências: ${res.pendentes}. Resolvidas agora: ${res.resolvidas}.`,'ok');
-  }catch(e){toast('Erro ao importar JSON: '+(e.message||e),'err');}
-}
-function validarCerebroTenant(){
-  try{normalizarCerebroAdmin($v('tBrainJsonRaw')||'{}','tenant'); toast('JSON do tenant valido.','ok');}catch(e){toast('JSON invalido: '+(e.message||e),'err');}
+  return `<b>Resposta local do Superadmin</b>${erro?`<br><small>API indisponivel: ${escSA(erro)}</small>`:''}<br><br>${escSA(ctx).replace(/\n/g,'<br>')}<br><br><b>Leitura:</b> use este painel para auditar tenants, modulos, chaves Gemini e eventos. Se a pergunta depender de dados que nao estao carregados no Superadmin, nao ha dado registrado nesta tela.`;
 }
 
 async function salvarConfigIA(){
-  const cloud=$v('iaCloudName'), preset=$v('iaCloudPreset');
+  const key=$v('iaGeminiKey'), cloud=$v('iaCloudName'), preset=$v('iaCloudPreset');
   try{
+    // Salva no RTDB global
+    await fetch('https://thiaguinho-40a14-default-rtdb.firebaseio.com/admin_config/gemini_api_key.json',{method:'PUT',body:JSON.stringify(key)});
     await fetch('https://thiaguinho-40a14-default-rtdb.firebaseio.com/admin_config/cloudinary_name.json',{method:'PUT',body:JSON.stringify(cloud)});
     await fetch('https://thiaguinho-40a14-default-rtdb.firebaseio.com/admin_config/cloudinary_preset.json',{method:'PUT',body:JSON.stringify(preset)});
-    const raw=$v('iaBrainGlobalJson').trim();
-    if(raw){
-      const brain=normalizarCerebroAdmin(raw,'global');
-      await db.collection('cerebros_ia').doc('global').set(brain,{merge:true});
-      try{sessionStorage.setItem('thia_cerebro_global',JSON.stringify(brain));}catch(e){}
-    }
-    toast('Configuração local salva.');
-  }catch(e){toast('ERRO: '+(e.message||e),'err');}
+    // Propaga para todos os tenants que não têm key própria
+    const batch=db.batch();
+    allTenants.forEach(t=>{
+      if(!t.apiKeys?.gemini&&key){
+        batch.update(db.collection('oficinas').doc(t.id),{'apiKeys.gemini':key,'apiKeys.cloudName':cloud,'apiKeys.cloudPreset':preset});
+        try{batch.update(db.collection('tenants').doc(t.id),{'apiKeys.gemini':key});}catch(e){}
+      }
+    });
+    await batch.commit();
+    toast('✓ CONFIG SALVA E PROPAGADA PARA '+allTenants.filter(t=>!t.apiKeys?.gemini).length+' TENANTS');
+  }catch(e){toast('✕ ERRO: '+e.message,'err');}
 }
 
-async function testarCerebroLocal(){
+async function testarGemini(){
+  const key=$v('iaGeminiKey'); const prompt=$v('iaTestInput');
+  if(!key){toast('⚠ Configure a key primeiro','warn');return;}
+  if(!prompt){toast('⚠ Digite uma pergunta','warn');return;}
+  const res=$('iaTestResult'); res.style.display='block'; res.innerText='⏳ Chamando Gemini...';
+  try{
+    const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})});
+    const data=await r.json();
+    if(!r.ok) throw new Error(data.error?.message||'Erro HTTP '+r.status);
+    res.innerText=data.candidates?.[0]?.content?.parts?.[0]?.text||'Sem resposta';
+    res.style.color='var(--success)';
+  }catch(e){res.innerText='✕ '+e.message;res.style.color='var(--danger)';}
+}
+
+async function testarGemini(){
+  const key=$v('iaGeminiKey');
   const prompt=$v('iaTestInput');
   if(!prompt){toast('Digite uma pergunta','warn');return;}
   const res=$('iaTestResult');
   res.style.display='block';
-  res.innerHTML='<span class="j-spinner"></span> Consultando dados internos...';
-  try{
-    if(typeof window.thiaCarregarCerebroGlobal==='function') await window.thiaCarregarCerebroGlobal();
-    res.innerHTML=respostaLocalSuperadminIA(prompt);
+  res.innerText='Chamando IA...';
+  if(!key){
+    res.innerHTML=respostaLocalSuperadminIA(prompt,'chave Gemini nao configurada');
     res.style.color='var(--muted2)';
+    return;
+  }
+  try{
+    const systemPrompt=`Voce e o thIAguinho Superadmin. Use somente o contexto abaixo para auditar tenants, modulos, chaves e riscos do SaaS. Nao invente dados e diga quando nao houver dado carregado.\n\n${montarContextoSuperadminIA()}`;
+    const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        contents:[{parts:[{text:prompt}]}],
+        systemInstruction:{parts:[{text:systemPrompt}]},
+        generationConfig:{temperature:.35,maxOutputTokens:1200}
+      })
+    });
+    const data=await r.json();
+    if(!r.ok) throw new Error(data.error?.message||'Erro HTTP '+r.status);
+    res.innerHTML=escSA(data.candidates?.[0]?.content?.parts?.map(p=>p.text).filter(Boolean).join('\n')||'Sem resposta').replace(/\n/g,'<br>');
+    res.style.color='var(--success)';
   }catch(e){
-    res.innerHTML='Erro local: '+escSA(e.message||e);
-    res.style.color='var(--danger)';
+    res.innerHTML=respostaLocalSuperadminIA(prompt,e.message||e);
+    res.style.color='var(--muted2)';
   }
 }
+
 // SAAS FIN
 function prepSaasFin(){
   ['sfDesc','sfValor','sfComissaoResp','sfComissaoPct'].forEach(f=>{if($(f))$(f).value='';});
@@ -1453,9 +1246,6 @@ window.onload=()=>{
 </script>
 <script src="js/theme.js"></script>
 <script src="js/hardening-comercial.js"></script>
-<script src="js/ia.js"></script>
 <script src="js/uix-theme-fix.js"></script>
-<script src="js/superadmin-cadastros-fix-20260518.js"></script>
 </body>
 </html>
-
