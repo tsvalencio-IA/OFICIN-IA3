@@ -1031,13 +1031,25 @@
     return Array.from(mapa.values());
   }
 
+  function agruparServicosSoltosPorSecao(soltos) {
+    const mapa = new Map();
+    function secaoItem(nome) {
+      const key = limparTexto(nome || 'OUTROS SERVICOS') || 'OUTROS SERVICOS';
+      if (!mapa.has(key)) mapa.set(key, { secao: key, servicos: [] });
+      return mapa.get(key);
+    }
+    (soltos || []).forEach(s => secaoItem(classificarSecao(s)).servicos.push(s));
+    return Array.from(mapa.values());
+  }
+
   function contarLinhasComposicaoOS(linhasPecas, linhasServ) {
     if (!(linhasPecas || []).length && !(linhasServ || []).length) return 0;
     const { grupos, soltos } = agruparComposicaoOS(linhasPecas, linhasServ);
-    const secoes = agruparComposicaoPorSecao(grupos, soltos);
-    return 2 + secoes.reduce((sum, sec) => {
-      return sum + 1 + sec.grupos.reduce((soma, g) => soma + 1 + g.servicos.length, 0) + sec.soltos.length;
-    }, 0);
+    const secoes = agruparComposicaoPorSecao(grupos, []);
+    const soltosSecoes = agruparServicosSoltosPorSecao(soltos);
+    const linhasComPeca = secoes.reduce((sum, sec) => sum + 1 + sec.grupos.reduce((soma, g) => soma + 1 + g.servicos.length, 0), 0);
+    const linhasSemPeca = soltosSecoes.length ? 1 + soltosSecoes.reduce((sum, sec) => sum + 1 + sec.servicos.length, 0) : 0;
+    return 2 + linhasComPeca + linhasSemPeca;
   }
 
   function bordarLinhaOS(ws, row, tipo) {
@@ -1166,7 +1178,8 @@
     const totalRows = contarLinhasComposicaoOS(linhasPecas, linhasServ);
     if (!totalRows) return 0;
     const { grupos, soltos } = agruparComposicaoOS(linhasPecas, linhasServ);
-    const secoes = agruparComposicaoPorSecao(grupos, soltos);
+    const secoes = agruparComposicaoPorSecao(grupos, []);
+    const soltosSecoes = agruparServicosSoltosPorSecao(soltos);
     let row = startRow;
     tituloBlocoOS(ws, row++, 'COMPOSIÇÃO DA O.S. POR PEÇA E SERVIÇO VINCULADO');
     inserirCabecalhoComposicaoOS(ws, row++);
@@ -1208,7 +1221,7 @@
         });
       });
 
-      sec.soltos.forEach(s => {
+      (sec.soltos || []).forEach(s => {
         limparRangeResumo(ws, row);
         setCell(ws, 'B' + row, textoItemServico(s));
         setCell(ws, 'D' + row, s.desc || 'SERVIÇO SEM DESCRIÇÃO');
@@ -1221,6 +1234,33 @@
         row++;
       });
     });
+
+    if (soltosSecoes.length) {
+      tituloBlocoOS(ws, row++, 'SERVIÇOS SEM PEÇA VINCULADA');
+      soltosSecoes.forEach(sec => {
+        limparRangeResumo(ws, row);
+        safeUnmerge(ws, `B${row}:H${row}`);
+        safeMerge(ws, `B${row}:H${row}`);
+        setCell(ws, 'B' + row, 'SEÇÃO: ' + sec.secao);
+        ws.getCell('B' + row).alignment = { horizontal: 'left', vertical: 'middle', wrapText: true, shrinkToFit: true };
+        bordarLinhaOS(ws, row, 'grupo');
+        ws.getRow(row).height = 18;
+        row++;
+
+        sec.servicos.forEach(s => {
+          limparRangeResumo(ws, row);
+          setCell(ws, 'B' + row, textoItemServico(s));
+          setCell(ws, 'D' + row, s.desc || 'SERVIÇO SEM DESCRIÇÃO');
+          setNumberCell(ws, 'E' + row, s.tempo, '0.00');
+          setMoneyCell(ws, 'F' + row, s.valorHora);
+          setPercentCell(ws, 'G' + row, s.descPct);
+          setMoneyCell(ws, 'H' + row, s.total);
+          bordarLinhaOS(ws, row, 'servico');
+          ws.getRow(row).height = Math.max(28, 12 * String(ws.getCell('B' + row).value || '').split('\n').length);
+          row++;
+        });
+      });
+    }
     return totalRows;
   }
 
