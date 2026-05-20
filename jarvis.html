@@ -3721,80 +3721,6 @@ window.renderAuditoria = function() {
 
 // IA LOCAL
 let _jiaHist = [];
-
-// CONTEXTO REAL DA IA RESTAURADO DO jarvis-faltando.html
-function _buildContextoIA() {
-  const hoje = new Date();
-  const mesAtual = hoje.toISOString().slice(0,7); // YYYY-MM
-
-  // ── OS ──
-  let osCtx = '';
-  (J.os || []).forEach(o => {
-    const cli = (J.clientes||[]).find(c=>c.id===o.clienteId)||{};
-    const veic = (J.veiculos||[]).find(v=>v.id===o.veiculoId)||{};
-    const servs = (o.servicos||[]).map(s=>`${s.desc}(${s.tempo||0}h R$${s.valor||0})`).join(', ');
-    const pecas = (o.pecas||[]).map(p=>`${p.desc||p.codigo} x${p.qtd||1} R$${p.venda||0}`).join(', ');
-    const UOS = window.JOS || window.JarvisOSUtils || {};
-    const itens = UOS.buildBudgetItems?.(o, null) || [];
-    const keys = UOS.getApprovedKeys?.(o) || new Set(o.itensAprovados || []);
-    const exec = o.execucaoItens || {};
-    const aprov = itens.filter(i=>keys.has(i.key)).map(i=>`${i.labelTipo||i.tipo}: ${i.desc} [exec:${exec[i.key]?.status||'pendente'}${exec[i.key]?.obs?' obs:'+exec[i.key].obs:''}]`).join('; ') || 'sem itens aprovados';
-    const nao = itens.length ? itens.filter(i=>!keys.has(i.key)).map(i=>`${i.labelTipo||i.tipo}: ${i.desc}`).join('; ') : 'sem itens não aprovados';
-    osCtx += `OS#${(o.id||'').slice(-6)} | ${o.status||'?'} | Cli:${cli.nome||o.cliente||'?'} | Veic:${veic.placa||o.placa||'?'} ${veic.modelo||o.veiculo||''} | KM:${o.km||'?'} | Data:${o.data||''} | Total:R$${o.total||0} | ORCAMENTO:[Serv:${servs}] [Peças:${pecas}] | APROVADOS:${aprov} | NAO_APROVADOS_HISTORICO:${nao} | EntregueA:${o.entreguePara||'-'}
-`;
-  });
-
-  // ── FINANCEIRO ──
-  const finHoje = (J.financeiro||[]).filter(f=>{
-    try { return new Date(f.data||f.vencimento).toDateString()===hoje.toDateString(); } catch(e){return false;}
-  });
-  const finMes = (J.financeiro||[]).filter(f=>{
-    try { return (f.data||f.vencimento||'').startsWith(mesAtual); } catch(e){return false;}
-  });
-  const contasPagar = finHoje.filter(f=>f.tipo==='despesa'||f.tipo==='saida');
-  const receitasMes = finMes.filter(f=>f.tipo==='receita'||f.tipo==='entrada').reduce((s,f)=>s+parseFloat(f.valor||0),0);
-  const despMes = finMes.filter(f=>f.tipo==='despesa'||f.tipo==='saida').reduce((s,f)=>s+parseFloat(f.valor||0),0);
-  const saldo = receitasMes - despMes;
-
-  let finCtx = `FINANCEIRO ${mesAtual}: Receitas=R$${receitasMes.toFixed(2)} Despesas=R$${despMes.toFixed(2)} Saldo=R$${saldo.toFixed(2)}
-`;
-  finCtx += `CONTAS PAGAR HOJE(${hoje.toLocaleDateString('pt-BR')}): ${contasPagar.length ? contasPagar.map(f=>`${f.desc||f.descricao||'?'} R$${f.valor||0}`).join('; ') : 'Nenhuma'}
-`;
-
-  // ── ESTOQUE ──
-  const estCrit = (J.estoque||[]).filter(p=>parseFloat(p.qtd||0)<=parseFloat(p.min||0));
-  const estCtx = `ESTOQUE: ${(J.estoque||[]).length} itens. Críticos(abaixo min): ${estCrit.length>0 ? estCrit.map(p=>`${p.desc}(${p.qtd}un)`).join(', ') : 'Nenhum'}
-`;
-
-  // ── EQUIPE / COMISSÕES ──
-  let equCtx = '';
-  (J.equipe||[]).forEach(e => {
-    const osMec = (J.os||[]).filter(o=>o.mecId===e.id&&(o.data||'').startsWith(mesAtual));
-    const totalMec = osMec.reduce((s,o)=>s+parseFloat(o.maoObra||o.total||0),0);
-    const comissao = +(totalMec * parseFloat(e.comissao||0)).toFixed(2);
-    equCtx += `Func:${e.nome||'?'} Cargo:${e.cargo||'?'} Salário:R$${e.salario||0} Comissão%:${(parseFloat(e.comissao||0)*100).toFixed(0)}% OS no mês:${osMec.length} MO gerada:R$${totalMec.toFixed(2)} Comissão a pagar:R$${comissao}
-`;
-  });
-
-  // ── CLIENTES / VEÍCULOS ──
-  const cliCtx = `CLIENTES: ${(J.clientes||[]).length} cadastrados. VEÍCULOS: ${(J.veiculos||[]).length} cadastrados.
-`;
-
-  return [
-    `=== CONTEXTO REAL DO SISTEMA thIAguinho (${new Date().toLocaleString('pt-BR')}) ===`,
-    `OFICINA: ${J.tnome||'?'} | USUÁRIO: ${J.nome||'?'}`,
-    cliCtx,
-    `=== ORDENS DE SERVIÇO (${(J.os||[]).length} total) ===`,
-    osCtx || 'Nenhuma OS cadastrada.',
-    `=== FINANCEIRO ===`,
-    finCtx,
-    estCtx,
-    `=== EQUIPE (${(J.equipe||[]).length} funcionários) ===`,
-    equCtx || 'Sem funcionários cadastrados.',
-    `=== FIM DO CONTEXTO ===`
-  ].join('\n');
-}
-
 function _jiaAddMsg(tipo, html) {
   const c = document.getElementById('iaMsgs'); if(!c) return {innerHTML:''};
   const d = document.createElement('div');
@@ -3808,64 +3734,17 @@ function _jiaAddMsg(tipo, html) {
 async function _jiaChamar(pergunta) {
   _jiaAddMsg('user', pergunta);
   const lidDiv = _jiaAddMsg('bot', '<strong>thIAguinho:</strong> <span class="j-spinner"></span> Consultando dados internos...');
-
-  // 1) Primeiro tenta preservar a evolução nova: motor/cérebro externo do jarvis(31).
   try {
     if (typeof window.thiaCarregarCerebroGlobal === 'function') await window.thiaCarregarCerebroGlobal();
-    if (typeof window.thiaResponderLocal === 'function') {
-      const respLocal = window.thiaResponderLocal(pergunta, { perfil:'jarvis', contexto: (typeof _buildContextoIA === 'function' ? _buildContextoIA() : '') });
-      if (respLocal && !String(respLocal).includes('Motor interno indisponivel')) {
-        _jiaHist.push({r:'bot', t:String(respLocal).replace(/<br\s*\/?>/gi,'\n').replace(/<[^>]+>/g,'')});
-        lidDiv.innerHTML = `<strong>thIAguinho:</strong> ${respLocal}`;
-        return;
-      }
-    }
+    const resp = typeof window.thiaResponderLocal === 'function'
+      ? window.thiaResponderLocal(pergunta, { perfil:'jarvis' })
+      : 'Motor interno indisponivel nesta tela.';
+    _jiaHist.push({r:'bot', t:String(resp).replace(/<br\s*\/?>/gi,'\n').replace(/<[^>]+>/g,'')});
+    lidDiv.innerHTML = `<strong>thIAguinho:</strong> ${resp}`;
   } catch(e) {
-    // Se o motor novo falhar, não quebra a IA: cai para a lógica antiga abaixo.
-    console.warn('IA local externa indisponível, usando fallback Gemini/contexto real:', e);
-  }
-
-  // 2) Fallback restaurado do jarvis-faltando: monta contexto real do sistema e consulta Gemini direto.
-  const key = J.gemini || J.oficina?.apiKeys?.gemini || J.oficina?.geminiKey || null;
-  const ctx = (typeof _buildContextoIA === 'function') ? _buildContextoIA() : '';
-
-  if (!key) {
-    lidDiv.innerHTML = `<strong>thIAguinho:</strong> ⚠ Motor interno indisponível e chave Gemini não configurada. Vá em Configurações → API Keys → Gemini para ativar o fallback da IA.`;
-    return;
-  }
-
-  try {
-    const msgs = _jiaHist.map(h=>({role:h.r==='user'?'user':'model',parts:[{text:h.t}]}));
-    const sysPrompt = `Você é o thIAguinho, assistente administrativo da oficina ${J.tnome||''}.
-REGRAS ABSOLUTAS:
-1. Responda APENAS com base nos dados reais do sistema fornecidos abaixo. NUNCA invente valores, nomes, datas ou informações.
-2. Se a informação não estiver nos dados, diga "Não encontrei essa informação no sistema." Não suponha.
-3. Seja direto, objetivo e use formatação clara.
-4. Para perguntas financeiras, use APENAS os dados do campo FINANCEIRO.
-5. Para histórico de veículos, use APENAS os dados do campo ORDENS DE SERVIÇO.
-6. Para salários e comissões, use APENAS os dados do campo EQUIPE.
-
-${ctx}`;
-
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(key)}`, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        contents: msgs,
-        systemInstruction: { parts: [{ text: sysPrompt }] }
-      })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data?.error?.message || `HTTP ${res.status}`);
-    const resp = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!resp) throw new Error('Resposta vazia da IA.');
-    _jiaHist.push({r:'bot', t:resp});
-    lidDiv.innerHTML = `<strong>thIAguinho:</strong> ${resp.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}`;
-  } catch(e) {
-    lidDiv.innerHTML = `<strong>thIAguinho:</strong> ❌ Erro na IA: ${e.message || e}`;
+    lidDiv.innerHTML = `<strong>thIAguinho:</strong> Nao consegui cruzar os dados internos: ${e.message || e}`;
   }
 }
-
 window.iaPerguntar = function() {
   const inp = document.getElementById('iaInput');
   const msg = inp?.value?.trim();
@@ -3878,13 +3757,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Enter') window.iaPerguntar();
   });
 });
-window.iaAnalisarDRE = function() {
-  _jiaChamar('Analise o DRE do mês atual: receitas, despesas, saldo, e me diga se está saudável ou se há alertas.');
-};
-
-window.iaAnalisarEstoque = function() {
-  _jiaChamar('Analise o estoque atual: quais itens estão abaixo do mínimo, quais precisam ser comprados urgente, e o total em estoque.');
-};
+window.iaAnalisarDRE = function() { _jiaChamar('Analise o financeiro atual e aponte vencidos, riscos e prioridades.'); };
+window.iaAnalisarEstoque = function() { _jiaChamar('Quais pecas estao em estoque critico e precisam de reposicao?'); };
 </script>
 <script src="js/fiscal.js"></script>
 <script src="js/financeiro.js"></script>
@@ -3905,6 +3779,305 @@ window.iaAnalisarEstoque = function() {
 <script src="js/uix-theme-fix.js"></script>
 <script src="js/hardening-operacional-20260515.js"></script>
 <script src="js/operacional-cadastros-nf-fix-20260518.js"></script>
+
+
+<script>
+/* =====================================================================
+   JARVIS SAFE BRIDGE v4 — camada antirregressão NÃO INVASIVA
+   Base preservada: jarvis(31).html
+   Objetivo:
+   1) não travar bootstrap/login/Firebase;
+   2) adicionar busca de peças/serviços dentro da O.S. sem mexer no HTML original;
+   3) antes de salvar/exportar, sincronizar metadados visíveis da Tabela Tempária;
+   4) se o motor de IA externo falhar, oferecer contexto local real sem apagar o motor novo.
+   ===================================================================== */
+(function(){
+  'use strict';
+  if (window.__JARVIS_SAFE_BRIDGE_V4__) return;
+  window.__JARVIS_SAFE_BRIDGE_V4__ = true;
+
+  function log(){ try { console.log.apply(console, ['[Jarvis SafeBridge v4]'].concat([].slice.call(arguments))); } catch(e){} }
+  function warn(){ try { console.warn.apply(console, ['[Jarvis SafeBridge v4]'].concat([].slice.call(arguments))); } catch(e){} }
+  function byId(id){ return document.getElementById(id); }
+  function val(el){
+    try{
+      if (!el) return '';
+      if (el.tagName === 'SELECT') {
+        var opt = el.options && el.selectedIndex >= 0 ? el.options[el.selectedIndex] : null;
+        return String(el.value || (opt ? opt.textContent : '') || '').trim();
+      }
+      return String(el.value != null ? el.value : (el.textContent || '')).trim();
+    } catch(e){ return ''; }
+  }
+  function norm(v){
+    return String(v == null ? '' : v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\s+/g,' ').trim();
+  }
+  function parseNum(v){
+    var s = String(v == null ? '' : v).trim();
+    if (!s) return 0;
+    s = s.replace(/R\$|\s/g,'');
+    if (s.indexOf(',') >= 0) s = s.replace(/\./g,'').replace(',','.');
+    var n = parseFloat(s.replace(/[^0-9.\-]/g,''));
+    return isFinite(n) ? n : 0;
+  }
+  function money(n){
+    n = parseNum(n);
+    return n ? n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}) : '';
+  }
+
+  function injectCSS(){
+    if (byId('jarvis-safe-bridge-v4-css')) return;
+    var css = document.createElement('style');
+    css.id = 'jarvis-safe-bridge-v4-css';
+    css.textContent = `
+      #jarvisOsSearchV4{display:block;margin:0 0 14px;padding:12px;border:1px solid var(--border2);background:rgba(0,212,255,.045);border-radius:5px;position:relative;z-index:5;}
+      #jarvisOsSearchV4 .josv4-title{font-family:var(--fm);font-size:.68rem;letter-spacing:1.5px;color:var(--cyan);font-weight:700;text-transform:uppercase;margin-bottom:5px;}
+      #jarvisOsSearchV4 .josv4-help{font-size:.72rem;color:var(--muted2);margin-bottom:9px;line-height:1.35;}
+      #jarvisOsSearchV4 .josv4-row{display:flex;gap:8px;align-items:center;}
+      #jarvisOsSearchInputV4{flex:1;background:var(--surf2);border:1px solid var(--border);color:var(--text);border-radius:3px;padding:10px 12px;font-family:var(--ff);font-size:.88rem;outline:none;min-width:0;}
+      #jarvisOsSearchInputV4:focus{border-color:var(--cyan);box-shadow:0 0 0 2px rgba(0,212,255,.08);}
+      #jarvisOsSearchResultsV4{display:none;margin-top:8px;border:1px solid rgba(0,212,255,.20);border-radius:4px;background:var(--surf);max-height:260px;overflow:auto;box-shadow:0 10px 22px rgba(0,0,0,.28);}
+      #jarvisOsSearchResultsV4.open{display:block;}
+      .josv4-res{width:100%;display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;text-align:left;padding:9px 10px;background:transparent;border:0;border-bottom:1px solid rgba(0,212,255,.07);color:var(--text);cursor:pointer;font-family:var(--ff);}
+      .josv4-res:hover,.josv4-res.active{background:rgba(0,212,255,.09);}
+      .josv4-tag{font-family:var(--fm);font-size:.58rem;letter-spacing:1px;color:var(--cyan);border:1px solid rgba(0,212,255,.22);border-radius:10px;padding:2px 7px;white-space:nowrap;}
+      .josv4-main{min-width:0;}
+      .josv4-main strong{display:block;font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+      .josv4-main small{display:block;color:var(--muted2);font-size:.68rem;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+      .josv4-val{font-family:var(--fm);font-size:.66rem;color:var(--success);white-space:nowrap;}
+      .josv4-empty{padding:10px;color:var(--warn);font-family:var(--fm);font-size:.68rem;}
+      .josv4-highlight{outline:2px solid var(--cyan)!important;box-shadow:0 0 0 4px rgba(0,212,255,.14),0 10px 26px rgba(0,0,0,.28)!important;position:relative;z-index:20;}
+      @media(max-width:768px){#jarvisOsSearchV4{padding:10px;margin-bottom:12px;}#jarvisOsSearchV4 .josv4-row{flex-direction:column;align-items:stretch;}#jarvisOsSearchV4 .btn-ghost{width:100%;}.josv4-res{grid-template-columns:1fr;}.josv4-tag,.josv4-val{justify-self:start;}}
+    `;
+    document.head.appendChild(css);
+  }
+
+  function rowText(row){
+    if (!row) return '';
+    var parts = [row.textContent || ''];
+    try {
+      Array.prototype.forEach.call(row.querySelectorAll('input,select,textarea,button,[data-codigo],[data-desc],[data-descricao]'), function(el){
+        parts.push(val(el));
+        if (el.tagName === 'SELECT' && el.options && el.selectedIndex >= 0) parts.push(el.options[el.selectedIndex].textContent || '');
+        Array.prototype.forEach.call(el.attributes || [], function(a){ if (/^(data-|name|id|title|aria-label|placeholder|class)$/i.test(a.name)) parts.push(a.value || ''); });
+      });
+      Array.prototype.forEach.call(row.attributes || [], function(a){ if (/^data-/i.test(a.name)) parts.push(a.value || ''); });
+    } catch(e) {}
+    return parts.join(' ');
+  }
+  function firstVal(row, selectors){
+    for (var i=0;i<selectors.length;i++){
+      var el = row && row.querySelector(selectors[i]);
+      var v = val(el);
+      if (v) return v;
+    }
+    return '';
+  }
+  function collectItems(){
+    var items = [];
+    var serv = byId('containerServicosOS');
+    var pec = byId('containerPecasOS');
+    if (serv) Array.prototype.forEach.call(serv.children || [], function(row, idx){
+      if (!row || row.nodeType !== 1) return;
+      var desc = firstVal(row, ['.serv-desc','textarea[name*=desc]','textarea','input[name*=desc]','input[type=text]']) || 'Serviço sem descrição';
+      var cod = firstVal(row, ['.serv-codigo','.serv-codigo-tabela','.codigoTabela','[data-codigo]','input[name*=codigo]','input[id*=codigo]']) || row.dataset.codigoTabela || row.dataset.codigo || '';
+      var sistema = firstVal(row, ['.serv-secao-hora','.serv-sistema','.serv-sistema-tabela','select[name*=sistema]','input[name*=sistema]']) || row.dataset.sistemaTabela || row.dataset.secaoHora || '';
+      var valor = firstVal(row, ['.serv-valor','input[name*=valor]','input[id*=valor]','input[type=number]']);
+      items.push({tipo:'SERVIÇO', row:row, idx:idx, titulo:desc, detalhe:[cod && ('Cód. '+cod), sistema && ('Sistema '+sistema)].filter(Boolean).join(' • '), valor:money(valor), hay:norm(['serviço servico',desc,cod,sistema,valor,rowText(row)].join(' '))});
+    });
+    if (pec) Array.prototype.forEach.call(pec.children || [], function(row, idx){
+      if (!row || row.nodeType !== 1) return;
+      var desc = firstVal(row, ['.peca-desc-livre','.peca-sel','select','textarea','input[name*=desc]','input[type=text]']) || 'Peça sem descrição';
+      var cod = firstVal(row, ['.peca-codigo','input[name*=codigo]','input[id*=codigo]','[data-codigo]']) || row.dataset.codigo || row.dataset.codigoTabela || '';
+      var qtd = firstVal(row, ['.peca-qtd','input[name*=qtd]','input[type=number]']);
+      var venda = firstVal(row, ['.peca-venda','input[name*=venda]','input[name*=valor]']);
+      items.push({tipo:'PEÇA', row:row, idx:idx, titulo:desc, detalhe:[cod && ('Cód. '+cod), qtd && ('Qtd. '+qtd)].filter(Boolean).join(' • '), valor:money(venda), hay:norm(['peça peca produto estoque',desc,cod,qtd,venda,rowText(row)].join(' '))});
+    });
+    return items;
+  }
+
+  var currentResults = [];
+  var activeIdx = 0;
+  function renderResults(list, q){
+    var box = byId('jarvisOsSearchResultsV4');
+    if (!box) return;
+    box.innerHTML = '';
+    if (!String(q||'').trim()) { box.classList.remove('open'); return; }
+    box.classList.add('open');
+    if (!list.length) { box.innerHTML = '<div class="josv4-empty">Nenhum serviço ou peça encontrado nesta O.S.</div>'; return; }
+    list.slice(0,50).forEach(function(it, i){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'josv4-res' + (i === activeIdx ? ' active' : '');
+      b.innerHTML = '<span class="josv4-tag"></span><span class="josv4-main"><strong></strong><small></small></span><span class="josv4-val"></span>';
+      b.querySelector('.josv4-tag').textContent = it.tipo;
+      b.querySelector('strong').textContent = it.titulo;
+      b.querySelector('small').textContent = it.detalhe || 'Toque para ir até o item';
+      b.querySelector('.josv4-val').textContent = it.valor || 'IR';
+      b.onclick = function(){ goToItem(it); };
+      box.appendChild(b);
+    });
+  }
+  function scoreItem(it, terms){
+    var s = 0;
+    terms.forEach(function(t){
+      if (!t) return;
+      if (norm(it.titulo).indexOf(t) >= 0) s += 12;
+      if (norm(it.detalhe).indexOf(t) >= 0) s += 8;
+      if (it.hay.indexOf(t) >= 0) s += 3;
+    });
+    return s;
+  }
+  window.jarvisBuscarItemOSV4 = function(q){
+    try{
+      var nq = norm(q);
+      activeIdx = 0;
+      if (!nq) { currentResults = []; renderResults([], ''); return []; }
+      var terms = nq.split(' ').filter(Boolean);
+      currentResults = collectItems().map(function(it){ return {it:it, score:scoreItem(it, terms)}; })
+        .filter(function(x){ return x.score > 0 || terms.every(function(t){ return x.it.hay.indexOf(t) >= 0; }); })
+        .sort(function(a,b){ return b.score - a.score || a.it.idx - b.it.idx; })
+        .map(function(x){ return x.it; });
+      renderResults(currentResults, q);
+      return currentResults;
+    } catch(e){ warn('busca falhou sem interromper sistema:', e); return []; }
+  };
+  window.jarvisBuscaItemOSKeyV4 = function(ev){
+    try{
+      var max = currentResults.length;
+      if (ev.key === 'ArrowDown' && max) { ev.preventDefault(); activeIdx = Math.min(max-1, activeIdx+1); renderResults(currentResults, ev.target.value); }
+      if (ev.key === 'ArrowUp' && max) { ev.preventDefault(); activeIdx = Math.max(0, activeIdx-1); renderResults(currentResults, ev.target.value); }
+      if (ev.key === 'Enter' && max) { ev.preventDefault(); goToItem(currentResults[activeIdx] || currentResults[0]); }
+      if (ev.key === 'Escape') window.jarvisLimparBuscaItemOSV4();
+    } catch(e){}
+  };
+  window.jarvisLimparBuscaItemOSV4 = function(){
+    var inp = byId('jarvisOsSearchInputV4'); if (inp) inp.value = '';
+    currentResults = []; activeIdx = 0;
+    var box = byId('jarvisOsSearchResultsV4'); if (box) { box.innerHTML=''; box.classList.remove('open'); }
+    document.querySelectorAll('.josv4-highlight').forEach(function(el){ el.classList.remove('josv4-highlight'); });
+  };
+  function goToItem(it){
+    if (!it || !it.row) return;
+    try{
+      document.querySelectorAll('.josv4-highlight').forEach(function(el){ el.classList.remove('josv4-highlight'); });
+      it.row.classList.add('josv4-highlight');
+      it.row.scrollIntoView({behavior:'smooth', block:'center', inline:'nearest'});
+      var focus = it.row.querySelector('input,select,textarea,button');
+      setTimeout(function(){ try{ if (focus && focus.focus) focus.focus({preventScroll:true}); }catch(e){} }, 450);
+      setTimeout(function(){ try{ it.row.classList.remove('josv4-highlight'); }catch(e){} }, 3500);
+    } catch(e){ try { it.row.scrollIntoView(); } catch(_){} }
+  }
+  function ensureSearchBox(){
+    try{
+      injectCSS();
+      if (byId('jarvisOsSearchV4')) return;
+      var tab = byId('tabOS1');
+      if (!tab) return;
+      var box = document.createElement('div');
+      box.id = 'jarvisOsSearchV4';
+      box.innerHTML = '<div class="josv4-title">🔎 Pesquisar na O.S. — peças e serviços lançados</div>'+
+        '<div class="josv4-help">Digite nome, código interno, sistema, peça, serviço ou valor. Ao tocar no resultado, a tela vai direto para o item.</div>'+
+        '<div class="josv4-row"><input id="jarvisOsSearchInputV4" type="search" placeholder="Ex: pastilha, óleo, suspensão, 0561, freio..." autocomplete="off"><button type="button" class="btn-ghost" id="jarvisOsSearchClearV4">LIMPAR</button></div>'+
+        '<div id="jarvisOsSearchResultsV4"></div>';
+      var anchor = tab.firstElementChild;
+      if (anchor) tab.insertBefore(box, anchor.nextSibling); else tab.appendChild(box);
+      var inp = byId('jarvisOsSearchInputV4');
+      if (inp) {
+        inp.addEventListener('input', function(){ window.jarvisBuscarItemOSV4(this.value); });
+        inp.addEventListener('keydown', window.jarvisBuscaItemOSKeyV4);
+      }
+      var clear = byId('jarvisOsSearchClearV4');
+      if (clear) clear.addEventListener('click', window.jarvisLimparBuscaItemOSV4);
+      log('busca interna instalada');
+    } catch(e){ warn('não consegui instalar busca, sem travar sistema:', e); }
+  }
+
+  function readServicoRowsForMeta(){
+    var out = [];
+    var cont = byId('containerServicosOS');
+    if (!cont) return out;
+    Array.prototype.forEach.call(cont.children || [], function(row){
+      if (!row || row.nodeType !== 1) return;
+      var obj = {
+        desc: firstVal(row, ['.serv-desc','textarea','input[name*=desc]','input[type=text]']),
+        tempo: parseNum(firstVal(row, ['.serv-tempo','input[name*=tempo]','input[name*=hora]','input[type=number]'])),
+        valor: parseNum(firstVal(row, ['.serv-valor','input[name*=valor]'])),
+        codigoTabela: firstVal(row, ['.serv-codigo','.serv-codigo-tabela','.codigoTabela','input[name*=codigo]','input[id*=codigo]']) || row.dataset.codigoTabela || row.dataset.codigo || '',
+        sistemaTabela: firstVal(row, ['.serv-secao-hora','.serv-sistema','.serv-sistema-tabela','select[name*=sistema]','input[name*=sistema]']) || row.dataset.sistemaTabela || row.dataset.secaoHora || '',
+        tipoVeiculoTabela: firstVal(row, ['.serv-tipo-veiculo','.tipoVeiculoTabela','select[name*=tipo]','input[name*=tipo]']) || row.dataset.tipoVeiculoTabela || row.dataset.tipoVeiculo || ''
+      };
+      if (obj.desc || obj.codigoTabela || obj.sistemaTabela) out.push(obj);
+    });
+    return out;
+  }
+  window.jarvisPreservarTempaV4 = function(){
+    try{
+      var servs = readServicoRowsForMeta();
+      if (!servs.length) return servs;
+      var J = window.J || {};
+      var osId = val(byId('osId'));
+      var alvo = null;
+      if (osId && Array.isArray(J.os)) alvo = J.os.find(function(o){ return o && o.id === osId; });
+      if (alvo && Array.isArray(alvo.servicos)) {
+        alvo.servicos.forEach(function(s, i){
+          if (!s || !servs[i]) return;
+          ['codigoTabela','sistemaTabela','tipoVeiculoTabela'].forEach(function(k){ if (!s[k] && servs[i][k]) s[k] = servs[i][k]; });
+        });
+      }
+      window.__jarvisTempaSnapshotV4 = servs;
+      return servs;
+    } catch(e){ warn('preservação Tempária falhou sem interromper:', e); return []; }
+  };
+  function wrapFunction(name){
+    try{
+      var fn = window[name];
+      if (typeof fn !== 'function' || fn.__safeBridgeV4) return;
+      var wrapped = function(){
+        try { window.jarvisPreservarTempaV4(); } catch(e){}
+        return fn.apply(this, arguments);
+      };
+      wrapped.__safeBridgeV4 = true;
+      wrapped.__original = fn;
+      window[name] = wrapped;
+      log('wrapper instalado em', name);
+    } catch(e){ warn('wrapper falhou para '+name, e); }
+  }
+  function installWrappers(){
+    ['salvarOS','salvarOSContinuar','exportarOrcamentoPMSP','exportarOrcamentoPMSPItens'].forEach(wrapFunction);
+  }
+
+  function buildContextoLocal(){
+    try{
+      var J = window.J || {};
+      var hoje = new Date();
+      var mesAtual = hoje.toISOString().slice(0,7);
+      var osCtx = '';
+      (J.os || []).forEach(function(o){
+        var cli = (J.clientes||[]).find(function(c){return c.id===o.clienteId;}) || {};
+        var veic = (J.veiculos||[]).find(function(v){return v.id===o.veiculoId;}) || {};
+        var servs = (o.servicos||[]).map(function(s){return (s.desc||s.descricao||'?')+'('+((s.tempo||0))+'h R$'+(s.valor||0)+')';}).join(', ');
+        var pecas = (o.pecas||[]).map(function(p){return (p.desc||p.codigo||'?')+' x'+(p.qtd||1)+' R$'+(p.venda||0);}).join(', ');
+        osCtx += 'OS#'+String(o.id||'').slice(-6)+' | '+(o.status||'?')+' | Cli:'+(cli.nome||o.cliente||'?')+' | Veic:'+(veic.placa||o.placa||'?')+' '+(veic.modelo||o.veiculo||'')+' | KM:'+(o.km||'?')+' | Data:'+(o.data||'')+' | Total:R$'+(o.total||0)+' | Serviços:['+servs+'] | Peças:['+pecas+']\n';
+      });
+      var finMes = (J.financeiro||[]).filter(function(f){ return String(f.data||f.vencimento||'').indexOf(mesAtual) === 0; });
+      var rec = finMes.filter(function(f){return f.tipo==='receita'||f.tipo==='entrada';}).reduce(function(s,f){return s+parseNum(f.valor||0);},0);
+      var desp = finMes.filter(function(f){return f.tipo==='despesa'||f.tipo==='saida';}).reduce(function(s,f){return s+parseNum(f.valor||0);},0);
+      var estCrit = (J.estoque||[]).filter(function(p){return parseNum(p.qtd||0) <= parseNum(p.min||0);});
+      return ['=== CONTEXTO REAL DO SISTEMA thIAguinho ===','OFICINA: '+(J.tnome||'?')+' | USUÁRIO: '+(J.nome||'?'),'CLIENTES: '+((J.clientes||[]).length)+' | VEÍCULOS: '+((J.veiculos||[]).length),'=== ORDENS DE SERVIÇO ===', osCtx || 'Nenhuma OS cadastrada.','=== FINANCEIRO '+mesAtual+' ===','Receitas=R$'+rec.toFixed(2)+' Despesas=R$'+desp.toFixed(2)+' Saldo=R$'+(rec-desp).toFixed(2),'=== ESTOQUE ===','Itens: '+((J.estoque||[]).length)+' | Críticos: '+(estCrit.length ? estCrit.map(function(p){return (p.desc||p.codigo)+'('+p.qtd+'un)';}).join(', ') : 'Nenhum')].join('\n');
+    } catch(e){ return 'Contexto local indisponível: '+(e.message||e); }
+  }
+  if (typeof window._buildContextoIA !== 'function') window._buildContextoIA = buildContextoLocal;
+
+  function bootSafe(){
+    try { ensureSearchBox(); } catch(e){}
+    try { installWrappers(); } catch(e){}
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bootSafe); else bootSafe();
+  [300,800,1500,3000,6000].forEach(function(ms){ setTimeout(bootSafe, ms); });
+})();
+</script>
+
 </body>
 </html>
 
