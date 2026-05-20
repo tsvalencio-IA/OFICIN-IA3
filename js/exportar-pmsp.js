@@ -18,6 +18,36 @@
     return String(tpl.planilhaPMSP || TEMPLATE_URL_PADRAO).trim() || TEMPLATE_URL_PADRAO;
   }
 
+  function textoCelulaExportar(value) {
+    if (value == null) return '';
+    if (typeof value === 'object') {
+      if (value.richText) return value.richText.map(x => x.text || '').join('');
+      if (value.text) return String(value.text);
+      if (value.result != null) return String(value.result);
+      if (value.formula) return String(value.result ?? value.formula ?? '');
+    }
+    return String(value);
+  }
+
+  function ultimaLinhaUsadaExportar(ws) {
+    let last = 0;
+    ws.eachRow({ includeEmpty: false }, (row, rowNumber) => {
+      let hasValue = false;
+      row.eachCell({ includeEmpty: false }, cell => {
+        const txt = textoCelulaExportar(cell.value).trim();
+        if (txt) hasValue = true;
+      });
+      if (hasValue) last = Math.max(last, rowNumber);
+    });
+    return last;
+  }
+
+  function limparCorpoTemplateAgrupado(ws, startRow, linhasAgrupadas) {
+    const lastUsed = Math.max(PECA_TOTAL, ultimaLinhaUsadaExportar(ws));
+    const removeCount = Math.max(1, lastUsed - startRow + 1);
+    ws.spliceRows(startRow, removeCount, ...Array.from({ length: Math.max(1, linhasAgrupadas) }, () => []));
+  }
+
   function guinchoOSExportar(os) {
     const g = os?.deslocamentoGuincho || os?.guincho || {};
     const kmTotal = n(g.kmTotal || 0);
@@ -136,8 +166,13 @@
     const isTapecaria = /\b(tapecaria|capotaria|banco|assento|encosto|forro|estof)\b/;
     const isBorracharia = /\b(borracharia|pneu|pneus|roda|rodas|calota|balanceamento)\b/;
     const isLavagem = /\b(lavagem|higienizacao|higienizar|limpeza interna|polimento)\b/;
-    const isInjecao = /\b(injecao|injetor|injetores|bico|bicos|combustivel|alimentacao|bomba de combustivel|tanque)\b/;
-    const isMecanica = /\b(mecanica|motor|cambio|embreagem|transmissao|arrefecimento|radiador|suspensao|amortecedor|amortecedores|mola|molas|bandeja|pivo|terminal|bieleta|coifa|homocinetica|semieixo|semi eixo|semi-eixo|freio|pastilha|pastilhas|disco|tambor|direcao|retifica|rolamento)\b/;
+    const isFreio = /\b(freio|freios|pastilha|pastilhas|disco|discos|tambor|tambores|pin[cç]a|cilindro mestre|servo freio|fluido de freio|pist[aã]o do freio)\b/;
+    const isSuspensao = /\b(suspensao|suspens[aã]o|amortecedor|amortecedores|mola|molas|batente|coxim|bandeja|bra[cç]o oscilante|barra estabilizadora|bieleta|piv[oô]|terminal|bucha|buchas|haste da barra|barra de tor[cç][aã]o)\b/;
+    const isDirecao = /\b(direcao|dire[cç][aã]o|caixa de dire[cç][aã]o|barra axial|terminal de dire[cç][aã]o|coluna de dire[cç][aã]o)\b/;
+    const isMotor = /\b(motor|correia dentada|correia|tensor|tampa de v[aá]lvulas|junta da tampa|coletor|retifica|cabe[cç]ote|arrefecimento|radiador|mangueira|intercooler|compressor|condensador|ar condicionado|filtro de [oó]leo|filtro do ar|filtro de ar|vela|velas|cabo de vela|cabos de vela)\b/;
+    const isCambio = /\b(cambio|c[aâ]mbio|embreagem|atuador de embreagem|kit de embreagem|transmissao|transmiss[aã]o|homocinetica|homocin[eé]tica|semieixo|semi eixo|semi-eixo|coifa do semi|coifa externa|coifa interna)\b/;
+    const isInjecao = /\b(injecao|inje[cç][aã]o|injetor|injetores|bico|bicos|combustivel|combust[ií]vel|alimentacao|alimenta[cç][aã]o|bomba de combustivel|bomba de combust[ií]vel|tanque|boia|b[oó]ia)\b/;
+    const isMecanica = /\b(mecanica|mec[aâ]nica|rolamento|rolamentos)\b/;
     const isEletrica = /\b(eletrica|eletrico|eletronica|alternador|bateria|lampada|lanterna|farol|sensor|chicote|fusivel|rele|motor de partida|vidro eletrico|trava eletrica)\b/;
 
     // Primeiro usa a DESCRIÇÃO do serviço. Ela é mais específica que a seção PMSP,
@@ -147,14 +182,24 @@
     if (isTapecaria.test(desc)) return 'TAPECARIA / CAPOTARIA';
     if (isBorracharia.test(desc)) return 'BORRACHARIA';
     if (isLavagem.test(desc)) return 'LAVAGEM / HIGIENIZACAO';
+    if (isFreio.test(desc)) return 'FREIO';
+    if (isSuspensao.test(desc)) return 'SUSPENSAO';
+    if (isDirecao.test(desc)) return 'DIRECAO';
+    if (isCambio.test(desc)) return 'CAMBIO / TRANSMISSAO';
+    if (isMotor.test(desc)) return 'MOTOR / ARREFECIMENTO';
     if (isInjecao.test(desc)) return 'INJECAO / ALIMENTACAO';
-    if (isMecanica.test(desc)) return 'MECANICA';
     if (isEletrica.test(desc)) return 'ELETRICA';
+    if (isMecanica.test(desc)) return 'MECANICA';
 
     if (isFunilaria.test(t)) return 'FUNILARIA / PINTURA';
     if (isTapecaria.test(t)) return 'TAPECARIA / CAPOTARIA';
     if (isBorracharia.test(t)) return 'BORRACHARIA';
     if (isLavagem.test(t)) return 'LAVAGEM / HIGIENIZACAO';
+    if (isFreio.test(t)) return 'FREIO';
+    if (isSuspensao.test(t)) return 'SUSPENSAO';
+    if (isDirecao.test(t)) return 'DIRECAO';
+    if (isCambio.test(t)) return 'CAMBIO / TRANSMISSAO';
+    if (isMotor.test(t)) return 'MOTOR / ARREFECIMENTO';
     if (isInjecao.test(t)) return 'INJECAO / ALIMENTACAO';
 
     if (/mecanica\s+eletrica\s+geral/.test(sistema) || (isMecanica.test(t) && isEletrica.test(t))) return 'MECANICA';
@@ -1512,7 +1557,7 @@
 
     const composicaoRows = contarLinhasComposicaoOS(linhasPecas, linhasServ);
     const blocoRows = Math.max(1, composicaoRows);
-    ws.spliceRows(18, PECA_TOTAL - 18 + 1, ...Array.from({ length: blocoRows }, () => []));
+    limparCorpoTemplateAgrupado(ws, 18, blocoRows);
 
     const totalGeralRow = 18 + blocoRows;
     const vistoriaRow = totalGeralRow + 1;
