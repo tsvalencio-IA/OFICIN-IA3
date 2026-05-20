@@ -380,6 +380,45 @@ function _pick(...values){
   }
   return '';
 }
+function _normTempaOficial(v){
+  return String(v||'')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .toUpperCase().replace(/[^A-Z0-9]+/g,' ')
+    .trim();
+}
+function _codigoServicoOficial(s){
+  if(!s) return { interno:'', siafisico:'', item:null };
+  const itens = window._tabelaTempa?.dados?.itens || [];
+  const codigos = [
+    s.codigoInterno,
+    s.codigoTabela,
+    s.codigoSiafisico,
+    s.codigoSIAFISICO,
+    s.codSiafisico,
+    s.codigoTemparia,
+    s.codigo
+  ].map(v=>String(v||'').trim()).filter(Boolean);
+  const codigosNorm = new Set(codigos.map(_normTempaOficial).filter(Boolean));
+  let item = itens.find(it=>{
+    const ci=_normTempaOficial(it.codigoInterno);
+    const ct=_normTempaOficial(it.codigo);
+    return (ci && codigosNorm.has(ci)) || (ct && codigosNorm.has(ct));
+  });
+  if(!item){
+    const descNorm=_normTempaOficial([s.desc,s.descricao,s.servico].filter(Boolean).join(' '));
+    const sistemaNorm=_normTempaOficial(s.sistemaTabela||s.sistema||s.secaoHoraLabel||'');
+    item = itens.find(it=>{
+      const itemNorm=_normTempaOficial([it.operacao,it.item].filter(Boolean).join(' '));
+      const sistemaItem=_normTempaOficial(it.sistema||'');
+      return itemNorm && descNorm && (descNorm.includes(itemNorm) || itemNorm.includes(descNorm)) && (!sistemaNorm || !sistemaItem || sistemaNorm.includes(sistemaItem) || sistemaItem.includes(sistemaNorm));
+    });
+  }
+  const interno=String(s.codigoInterno||s.codigoInternoTempa||s.codigoTempaInterno||item?.codigoInterno||'').trim();
+  let siafisico=String(s.codigoTabela||s.codigoSiafisico||s.codigoSIAFISICO||s.codSiafisico||item?.codigo||'').trim();
+  const codigoSolto=String(s.codigo||'').trim();
+  if(!siafisico && codigoSolto && _normTempaOficial(codigoSolto)!==_normTempaOficial(interno)) siafisico=codigoSolto;
+  return { interno, siafisico, item };
+}
 function nBR(v){
   if(typeof v === 'number' && isFinite(v)) return v;
   const s=String(v==null?'':v).replace(/\s/g,'').replace(/R\$/gi,'');
@@ -494,7 +533,8 @@ function _resumoSecoesOS(os){
     out[secao].horas+=tempo;
     out[secao].total+=+(valorBruto*(1-descMO)).toFixed(2);
     out[secao].qtd+=1;
-    const codigo=String(s.codigoInterno||s.codigoTabela||s.codigo||'').trim();
+    const codServico=_codigoServicoOficial(s);
+    const codigo=String(codServico.interno||codServico.siafisico||s.codigo||'').trim();
     const sistema=String(s.sistemaTabela||s.sistema||s.secaoHoraLabel||'').trim();
     const tipo=_tipoVeiculoServicoKPI(s,os);
     if(codigo) out[secao].codigos.add(codigo);
@@ -653,6 +693,9 @@ function _ligarListeners(){
     _OS=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>((b.updatedAt||'')>(a.updatedAt||''))?1:-1);
     _renderStats();
     _renderOS();
+    if(typeof window.tempaCarregar==='function'){
+      window.tempaCarregar().then(()=>{ _renderOS(); _renderStats(); }).catch(()=>{});
+    }
     _renderHist();
   });
 
@@ -791,8 +834,15 @@ function _buildOSCard(os){
     const tipoVeic=_tipoVeiculoServicoKPI(s,os);
     const vf=+(vBruto*(1-pctDescMO)).toFixed(2);
     totalMO+=vf; totalTMO+=t;
+    const codServico=_codigoServicoOficial(s);
+    const codigoHtml=codServico.interno
+      ? `<code style="font-size:.7rem;color:var(--gov)">CÓD. INTERNO: ${esc(codServico.interno)}</code> `
+      : (codServico.siafisico||s.codigo?`<code style="font-size:.7rem;color:var(--gov)">CÓD.: ${esc(codServico.siafisico||s.codigo)}</code> `:'');
+    const metaCodigo=codServico.siafisico && (!codServico.interno || _normTempaOficial(codServico.siafisico)!==_normTempaOficial(codServico.interno))
+      ? `CÓD. SIAFÍSICO: ${esc(codServico.siafisico)} · `
+      : '';
     const riscado=pctDescMO>0?`<span style="color:var(--muted);text-decoration:line-through;font-size:.75rem">${moeda(vBruto)}</span> <span style="color:var(--ok);font-size:.7rem">-${(pctDescMO*100).toFixed(0)}%</span> `:'';
-    return `<div class="detalhe-row"><span>${s.codigoInterno||s.codigoTabela||s.codigo?`<code style="font-size:.7rem;color:var(--gov)">${esc(s.codigoInterno||s.codigoTabela||s.codigo)}</code> `:''}${esc(s.desc||'—')}${badgeAprovacao('servico-'+idx)}<br><small style="color:var(--muted)">${s.codigoInterno&&s.codigoTabela&&s.codigoTabela!==s.codigoInterno?`SIAFÍSICO ${esc(s.codigoTabela)} · `:``}${esc(secao)}${tipoVeic?` · Tipo veículo: ${esc(tipoVeic)}`:''}${t?` · ${String(t).replace('.',',')}h`:''}${valorHora?` · ${moeda(valorHora)}/h`:''}</small></span><span class="detalhe-val" style="text-align:right">${riscado}${moeda(vf)}</span></div>`;
+    return `<div class="detalhe-row"><span>${codigoHtml}${esc(s.desc||'—')}${badgeAprovacao('servico-'+idx)}<br><small style="color:var(--muted)">${metaCodigo}${esc(secao)}${tipoVeic?` · Tipo veículo: ${esc(tipoVeic)}`:''}${t?` · ${String(t).replace('.',',')}h`:''}${valorHora?` · ${moeda(valorHora)}/h`:''}</small></span><span class="detalhe-val" style="text-align:right">${riscado}${moeda(vf)}</span></div>`;
   }).join('');
 
   const lsPec=(os.pecas||[]).map((p,idx)=>{
